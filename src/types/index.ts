@@ -1,0 +1,47 @@
+export type TaskId =
+  | 'wake_up'
+  | 'workout'
+  | 'water'
+  | 'family_time'
+  | 'financial'
+  | 'diet'
+  | 'journal'
+  | 'no_substances';
+
+export interface Task {
+  id: TaskId;
+  title: string;
+  description: string;
+  icon: string;
+}
+
+export interface DayLog {
+  date: string; // 'YYYY-MM-DD'
+  completedTasks: Partial<Record<TaskId, boolean>>;
+  isComplete: boolean;
+}
+
+export interface UserSettings {
+  name: string;
+  wakeTime: string; // 'HH:MM' 24-hour
+  startDate: string; // 'YYYY-MM-DD'
+}
+
+export interface RitualData {
+  settings: UserSettings;
+  days: Record<string, DayLog>;
+}
+
+export interface RitualContextType {
+  data: RitualData | null;
+  loading: boolean;
+  toggleTask: (taskId: TaskId) => Promise<void>;
+  saveSettings: (settings: UserSettings) => Promise<void>;
+  resetData: () => Promise<void>;
+  currentStreak: number;
+  bestStreak: number;
+  totalCompleteDays: number;
+  dayNumber: number;
+  todayProgress: { completed: number; total: number };
+  isTodayComplete: boolean;
+}
