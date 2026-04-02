@@ -1,8 +1,8 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
 import { RitualData, DayLog, UserSettings, TaskId } from '../types';
 import { getTodayString } from './dateUtils';
 
-const STORAGE_KEY = '@ritual_v1';
+const DATA_FILE = FileSystem.documentDirectory + 'ritual_data.json';
 
 export function getDefaultData(): RitualData {
   return {
@@ -17,9 +17,10 @@ export function getDefaultData(): RitualData {
 
 export async function loadData(): Promise<RitualData> {
   try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    if (!raw) return getDefaultData();
-    return JSON.parse(raw) as RitualData;
+    const info = await FileSystem.getInfoAsync(DATA_FILE);
+    if (!info.exists) return getDefaultData();
+    const content = await FileSystem.readAsStringAsync(DATA_FILE);
+    return JSON.parse(content) as RitualData;
   } catch {
     return getDefaultData();
   }
@@ -27,7 +28,7 @@ export async function loadData(): Promise<RitualData> {
 
 export async function saveData(data: RitualData): Promise<void> {
   try {
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    await FileSystem.writeAsStringAsync(DATA_FILE, JSON.stringify(data));
   } catch (e) {
     console.error('Failed to save ritual data:', e);
   }
