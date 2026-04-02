@@ -34,6 +34,7 @@ export default function AppNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
+        freezeOnBlur: false,
         tabBarIcon: ({ focused, size }) => {
           const icons = TAB_ICONS[route.name as keyof TabParamList];
           const name = focused ? icons.active : icons.inactive;
