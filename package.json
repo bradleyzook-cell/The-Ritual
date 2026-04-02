@@ -18,7 +18,7 @@
     "expo-haptics": "*",
     "expo-status-bar": "*",
     "react": "*",
-    "react-native": "*",
+    "react-native": "0.81.4",
     "react-native-safe-area-context": "*",
     "react-native-screens": "*"
   },
