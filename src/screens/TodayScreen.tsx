@@ -241,13 +241,13 @@ const completion = StyleSheet.create({
   },
   dayLabel: {
     fontSize: FONTS.sizes.lg,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textSecondary,
     letterSpacing: 4,
   },
   dayNumber: {
     fontSize: 96,
-    fontWeight: '900',
+    fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
     lineHeight: 100,
   },
@@ -259,12 +259,13 @@ const completion = StyleSheet.create({
   },
   completeText: {
     fontSize: FONTS.sizes.xxl,
-    fontWeight: '900',
+    fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
     letterSpacing: 6,
   },
   phrase: {
     fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     textAlign: 'center',
     letterSpacing: 1,
@@ -287,12 +288,12 @@ const completion = StyleSheet.create({
   streakFire: { fontSize: 22 },
   streakNum: {
     fontSize: FONTS.sizes.xl,
-    fontWeight: '900',
+    fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
   },
   streakLabel: {
     fontSize: FONTS.sizes.sm,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textSecondary,
     letterSpacing: 1,
   },
@@ -304,7 +305,7 @@ const completion = StyleSheet.create({
   },
   dismissText: {
     fontSize: FONTS.sizes.md,
-    fontWeight: '800',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textPrimary,
     letterSpacing: 3,
   },
@@ -344,6 +345,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.body,
     color: COLORS.textMuted,
     marginTop: 2,
     letterSpacing: 0.5,
@@ -361,7 +363,7 @@ const styles = StyleSheet.create({
   streakFire: { fontSize: 18 },
   streakCount: {
     fontSize: FONTS.sizes.xl,
-    fontWeight: '900',
+    fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
     lineHeight: 26,
   },
@@ -375,13 +377,14 @@ const styles = StyleSheet.create({
   },
   resetTitle: {
     fontSize: FONTS.sizes.md,
-    fontWeight: '900',
+    fontFamily: FONTS.heading,
     color: COLORS.redBright,
     letterSpacing: 2,
     marginBottom: SPACING.xs,
   },
   resetBody: {
     fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     lineHeight: 20,
   },
@@ -395,14 +398,14 @@ const styles = StyleSheet.create({
   },
   dayLabel: {
     fontSize: FONTS.sizes.sm,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.red,
     letterSpacing: 2,
   },
   progressLabel: {
     fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
-    fontWeight: '600',
   },
   progressTrack: {
     height: 4,
@@ -423,6 +426,7 @@ const styles = StyleSheet.create({
   },
   footerNote: {
     fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
     color: COLORS.textMuted,
     textAlign: 'center',
     marginTop: SPACING.md,

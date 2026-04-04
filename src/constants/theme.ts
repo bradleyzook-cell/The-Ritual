@@ -1,5 +1,4 @@
-// Primal / tribal color scheme — black and red
-// Hex codes can be swapped here once provided
+// Brand color: #AE2012
 export const COLORS = {
   // Backgrounds
   background: '#0A0A0A',
@@ -8,30 +7,36 @@ export const COLORS = {
   border: '#1E1E1E',
   borderStrong: '#2E2E2E',
 
-  // Red palette
-  red: '#C41E1E',       // primary accent
-  redBright: '#E52222', // active / highlight
-  redDark: '#7A0F0F',   // secondary accent
-  redDeep: '#3D0707',   // deep background tint
-  redMuted: '#4A1010',  // subtle fill
+  // Red palette — derived from brand #AE2012
+  red: '#AE2012',       // primary brand red
+  redBright: '#CE2416', // highlights / active states
+  redDark: '#8B1510',   // secondary red
+  redDeep: '#2E0A06',   // deep background tint
+  redMuted: '#4D1009',  // subtle fill
 
   // Text
   textPrimary: '#FFFFFF',
   textSecondary: '#888888',
   textMuted: '#444444',
 
-  // State colors
-  complete: '#C41E1E',    // task / day complete
-  missed: '#3D0707',      // missed day (past, not complete)
-  inProgress: '#7A0F0F',  // today, partial
-  upcoming: '#161616',    // future days
+  // State
+  complete: '#AE2012',
+  missed: '#2E0A06',
+  inProgress: '#8B1510',
+  upcoming: '#161616',
 
   // Tab bar
-  tabActive: '#E52222',
+  tabActive: '#CE2416',
   tabInactive: '#444444',
 };
 
+// Brand fonts
+// Anton SC → headers/titles
+// Source Sans 3 → body/labels
 export const FONTS = {
+  heading: 'AntonSC_400Regular',
+  body: 'SourceSans3_400Regular',
+  bodyBold: 'SourceSans3_700Bold',
   sizes: {
     xs: 11,
     sm: 13,

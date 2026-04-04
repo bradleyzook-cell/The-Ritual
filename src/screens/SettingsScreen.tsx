@@ -191,6 +191,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: COLORS.textMuted,
+    fontFamily: FONTS.body,
     fontSize: FONTS.sizes.sm,
     letterSpacing: 2,
   },
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: FONTS.sizes.xxl,
-    fontWeight: '900',
+    fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
     letterSpacing: 4,
   },
@@ -229,27 +230,27 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textMuted,
     letterSpacing: 1,
-    fontWeight: '600',
   },
   infoValue: {
     fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
-    fontWeight: '500',
   },
   infoValueRed: {
+    fontFamily: FONTS.bodyBold,
     color: COLORS.red,
-    fontWeight: '700',
   },
   fieldGroup: {
     marginBottom: SPACING.lg,
   },
   fieldLabel: {
     fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textMuted,
     letterSpacing: 2,
-    fontWeight: '700',
     marginBottom: SPACING.sm,
   },
   input: {
@@ -260,10 +261,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
     fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.body,
     color: COLORS.textPrimary,
   },
   fieldHint: {
     fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
     color: COLORS.textMuted,
     marginTop: SPACING.xs,
   },
@@ -279,7 +282,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     fontSize: FONTS.sizes.md,
-    fontWeight: '800',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textPrimary,
     letterSpacing: 2,
   },
@@ -293,9 +296,9 @@ const styles = StyleSheet.create({
   },
   dangerLabel: {
     fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textMuted,
     letterSpacing: 2,
-    fontWeight: '700',
     marginBottom: SPACING.md,
   },
   resetButton: {
@@ -309,12 +312,13 @@ const styles = StyleSheet.create({
   },
   resetButtonText: {
     fontSize: FONTS.sizes.md,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.redDark,
     letterSpacing: 2,
   },
   dangerHint: {
     fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
     color: COLORS.textMuted,
     textAlign: 'center',
   },

@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
   },
   heroBody: {
     fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     lineHeight: 24,
   },
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
   },
   overviewLabel: {
     fontSize: FONTS.sizes.xs,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textMuted,
     letterSpacing: 2,
     marginBottom: SPACING.md,
@@ -171,14 +172,14 @@ const styles = StyleSheet.create({
   },
   overviewNum: {
     fontSize: FONTS.sizes.sm,
-    fontWeight: '800',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.red,
     width: 28,
   },
   overviewTitle: {
     fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textSecondary,
-    fontWeight: '600',
     flex: 1,
   },
 
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
   },
   stepNumber: {
     fontSize: FONTS.sizes.xxxl,
-    fontWeight: '900',
+    fontFamily: FONTS.heading,
     color: COLORS.redDeep,
     lineHeight: FONTS.sizes.xxxl,
     width: 52,
@@ -202,7 +203,7 @@ const styles = StyleSheet.create({
   stepTitle: {
     flex: 1,
     fontSize: FONTS.sizes.md,
-    fontWeight: '800',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textPrimary,
     letterSpacing: 1,
     paddingTop: 6,
@@ -210,6 +211,7 @@ const styles = StyleSheet.create({
   },
   stepBody: {
     fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     lineHeight: 24,
     paddingLeft: 52 + SPACING.md,
@@ -237,6 +239,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.body,
     color: COLORS.textMuted,
     fontStyle: 'italic',
     lineHeight: 22,

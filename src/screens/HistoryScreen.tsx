@@ -240,17 +240,17 @@ function LegendItem({ color, border, label }: { color: string; border: string; l
 const legendStyles = StyleSheet.create({
   item: { flexDirection: 'row', alignItems: 'center', marginRight: SPACING.md, marginBottom: SPACING.xs },
   dot:  { width: 12, height: 12, borderRadius: 3, borderWidth: 1, marginRight: 6 },
-  label: { fontSize: FONTS.sizes.xs, color: COLORS.textSecondary },
+  label: { fontSize: FONTS.sizes.xs, fontFamily: FONTS.body, color: COLORS.textSecondary },
 });
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: COLORS.background },
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  loadingText: { color: COLORS.textMuted, fontSize: FONTS.sizes.sm, letterSpacing: 2 },
+  loadingText: { color: COLORS.textMuted, fontFamily: FONTS.body, fontSize: FONTS.sizes.sm, letterSpacing: 2 },
   scroll: { paddingHorizontal: SPACING.md, paddingBottom: SPACING.xxl },
   header: { paddingTop: SPACING.lg, paddingBottom: SPACING.md },
-  title: { fontSize: FONTS.sizes.xxl, fontWeight: '900', color: COLORS.textPrimary, letterSpacing: 4 },
-  subtitle: { fontSize: FONTS.sizes.sm, color: COLORS.textMuted, marginTop: 2 },
+  title: { fontSize: FONTS.sizes.xxl, fontFamily: FONTS.heading, color: COLORS.textPrimary, letterSpacing: 4 },
+  subtitle: { fontSize: FONTS.sizes.sm, fontFamily: FONTS.body, color: COLORS.textMuted, marginTop: 2 },
   statRow: {
     flexDirection: 'row',
     backgroundColor: COLORS.surface,
@@ -262,8 +262,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statBox: { flex: 1, alignItems: 'center' },
-  statValue: { fontSize: FONTS.sizes.lg, fontWeight: '800', color: COLORS.textPrimary },
-  statLabel: { fontSize: FONTS.sizes.xs, color: COLORS.textMuted, letterSpacing: 1, marginTop: 2 },
+  statValue: { fontSize: FONTS.sizes.lg, fontFamily: FONTS.heading, color: COLORS.textPrimary },
+  statLabel: { fontSize: FONTS.sizes.xs, fontFamily: FONTS.body, color: COLORS.textMuted, letterSpacing: 1, marginTop: 2 },
   divider: { width: 1, height: 32, backgroundColor: COLORS.border },
   phaseBlock: { marginBottom: SPACING.md },
   phaseHeader: {
@@ -272,8 +272,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: SPACING.sm,
   },
-  phaseLabel: { fontSize: FONTS.sizes.sm, fontWeight: '800', color: COLORS.red, letterSpacing: 2 },
-  phaseDays: { fontSize: FONTS.sizes.xs, color: COLORS.textMuted },
+  phaseLabel: { fontSize: FONTS.sizes.sm, fontFamily: FONTS.bodyBold, color: COLORS.red, letterSpacing: 2 },
+  phaseDays: { fontSize: FONTS.sizes.xs, fontFamily: FONTS.body, color: COLORS.textMuted },
   grid: { gap: CELL_GAP },
   row: { flexDirection: 'row', gap: CELL_GAP },
   cell: {
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cellNum: { fontSize: FONTS.sizes.sm, fontWeight: '700' },
+  cellNum: { fontSize: FONTS.sizes.sm, fontFamily: FONTS.bodyBold },
   cellCheck: { fontSize: 9, color: COLORS.textPrimary, position: 'absolute', bottom: 3, right: 5 },
   badgeWrap: {
     marginTop: SPACING.md,
@@ -297,6 +297,7 @@ const styles = StyleSheet.create({
   },
   badgeIncomplete: {
     fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
     color: COLORS.textMuted,
     textAlign: 'center',
     marginTop: SPACING.sm,

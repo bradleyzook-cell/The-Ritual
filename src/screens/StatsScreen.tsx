@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: COLORS.textMuted,
+    fontFamily: FONTS.body,
     fontSize: FONTS.sizes.sm,
     letterSpacing: 2,
   },
@@ -165,14 +166,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: FONTS.sizes.xxl,
-    fontWeight: '900',
+    fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
     letterSpacing: 4,
   },
   nameText: {
     fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.red,
-    fontWeight: '700',
     letterSpacing: 1,
   },
   streakHero: {
@@ -190,19 +191,20 @@ const styles = StyleSheet.create({
   },
   streakNumber: {
     fontSize: FONTS.sizes.xxxl,
-    fontWeight: '900',
+    fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
     lineHeight: FONTS.sizes.xxxl + 4,
   },
   streakLabel: {
     fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.bodyBold,
     color: COLORS.red,
-    fontWeight: '700',
     letterSpacing: 2,
     marginTop: SPACING.xs,
   },
   streakSub: {
     fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
     color: COLORS.textMuted,
     textAlign: 'center',
     marginTop: SPACING.sm,
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: FONTS.sizes.xxl,
-    fontWeight: '900',
+    fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
   },
   statValueGood: {
@@ -231,6 +233,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
     color: COLORS.textMuted,
     letterSpacing: 1,
     marginTop: 4,
@@ -238,7 +241,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: FONTS.sizes.sm,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textMuted,
     letterSpacing: 2,
     marginTop: SPACING.lg,
@@ -266,13 +269,14 @@ const styles = StyleSheet.create({
   },
   taskName: {
     fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.body,
     color: COLORS.textSecondary,
     flex: 1,
     marginRight: SPACING.sm,
   },
   taskPct: {
     fontSize: FONTS.sizes.sm,
-    fontWeight: '700',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textPrimary,
   },
   barTrack: {

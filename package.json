@@ -9,6 +9,8 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/anton-sc": "*",
+    "@expo-google-fonts/source-sans-3": "*",
     "expo-file-system": "*",
     "@expo/vector-icons": "^14.0.0",
     "babel-preset-expo": "*",

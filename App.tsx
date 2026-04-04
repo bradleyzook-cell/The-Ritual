@@ -3,6 +3,9 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';
+import { AntonSC_400Regular } from '@expo-google-fonts/anton-sc';
+import { SourceSans3_400Regular, SourceSans3_700Bold } from '@expo-google-fonts/source-sans-3';
 
 import { RitualProvider } from './src/context/RitualContext';
 import TodayScreen from './src/screens/TodayScreen';
@@ -30,6 +33,13 @@ const TAB_CONFIG: {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('Today');
+  const [fontsLoaded] = useFonts({
+    AntonSC_400Regular,
+    SourceSans3_400Regular,
+    SourceSans3_700Bold,
+  });
+
+  if (!fontsLoaded) return null;
 
   return (
     <SafeAreaProvider>
@@ -100,8 +110,8 @@ const styles = StyleSheet.create({
   },
   tabLabel: {
     fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
     color: COLORS.tabInactive,
-    fontWeight: '600',
     letterSpacing: 0.3,
   },
   tabLabelActive: {

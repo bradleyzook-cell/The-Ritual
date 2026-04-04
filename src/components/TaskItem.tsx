@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: FONTS.sizes.md,
-    fontWeight: '600',
+    fontFamily: FONTS.bodyBold,
     color: COLORS.textSecondary,
     letterSpacing: 0.3,
     marginBottom: 2,
@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.body,
     color: COLORS.textMuted,
   },
   checkbox: {
