@@ -7,6 +7,7 @@ import {
   Platform,
   Modal,
   Pressable,
+  Image,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -105,7 +106,11 @@ export default function TodayScreen() {
       >
         <SafeAreaView style={completion.root}>
           <View style={completion.content}>
-            <Text style={completion.eyebrow}>THE RITUAL</Text>
+            <Image
+              source={require('../../assets/logo-ritual.png')}
+              style={completion.logo}
+              resizeMode="contain"
+            />
 
             <View style={completion.dayWrap}>
               <Text style={completion.dayLabel}>DAY</Text>
@@ -146,7 +151,11 @@ export default function TodayScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.appTitle}>THE RITUAL</Text>
+            <Image
+              source={require('../../assets/logo-ritual.png')}
+              style={styles.ritualLogo}
+              resizeMode="contain"
+            />
             <Text style={styles.dateText}>{formatDisplayDate(today)}</Text>
           </View>
           <View style={styles.streakBadge}>
@@ -220,12 +229,11 @@ const completion = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: SPACING.xl,
   },
-  eyebrow: {
-    fontSize: FONTS.sizes.sm,
-    color: COLORS.red,
-    fontWeight: '700',
-    letterSpacing: 4,
-    marginBottom: SPACING.xl,
+  logo: {
+    width: 160,
+    height: 160,
+    marginBottom: SPACING.md,
+    borderRadius: 12,
   },
   dayWrap: {
     alignItems: 'center',
@@ -329,11 +337,10 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.lg,
     paddingBottom: SPACING.md,
   },
-  appTitle: {
-    fontSize: FONTS.sizes.xxl,
-    fontWeight: '900',
-    color: COLORS.textPrimary,
-    letterSpacing: 4,
+  ritualLogo: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
   },
   dateText: {
     fontSize: FONTS.sizes.sm,

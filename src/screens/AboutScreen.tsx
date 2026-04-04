@@ -4,6 +4,7 @@ import {
   Text,
   ScrollView,
   StyleSheet,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING, FONTS } from '../constants/theme';
@@ -60,8 +61,11 @@ export default function AboutScreen() {
       >
         {/* Hero */}
         <View style={styles.hero}>
-          <Text style={styles.heroEyebrow}>WARRBUILT PRESENTS</Text>
-          <Text style={styles.heroTitle}>THE{'\n'}RITUAL</Text>
+          <Image
+            source={require('../../assets/logo-ritual.png')}
+            style={styles.ritualLogo}
+            resizeMode="contain"
+          />
           <View style={styles.heroDivider} />
           <Text style={styles.heroBody}>
             Men require discipline to become warriors. Enter The Ritual — an 8-step daily action list to help center yourself around the Totems of your WARRPath.
@@ -94,6 +98,11 @@ export default function AboutScreen() {
         {/* Footer */}
         <View style={styles.footer}>
           <View style={styles.footerDivider} />
+          <Image
+            source={require('../../assets/logo-warrbuilt.png')}
+            style={styles.warrbuiltLogo}
+            resizeMode="contain"
+          />
           <Text style={styles.footerText}>
             WARRBuilt focuses on helping men identify their tribe and become who they are meant to be.
           </Text>
@@ -117,20 +126,12 @@ const styles = StyleSheet.create({
   hero: {
     paddingTop: SPACING.lg,
     paddingBottom: SPACING.xl,
+    alignItems: 'center',
   },
-  heroEyebrow: {
-    fontSize: FONTS.sizes.xs,
-    color: COLORS.red,
-    fontWeight: '700',
-    letterSpacing: 3,
-    marginBottom: SPACING.sm,
-  },
-  heroTitle: {
-    fontSize: 56,
-    fontWeight: '900',
-    color: COLORS.textPrimary,
-    letterSpacing: 6,
-    lineHeight: 60,
+  ritualLogo: {
+    width: 220,
+    height: 220,
+    borderRadius: 16,
   },
   heroDivider: {
     width: 48,
@@ -227,6 +228,12 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: COLORS.red,
     marginBottom: SPACING.lg,
+  },
+  warrbuiltLogo: {
+    width: 200,
+    height: 60,
+    alignSelf: 'center',
+    marginBottom: SPACING.md,
   },
   footerText: {
     fontSize: FONTS.sizes.sm,

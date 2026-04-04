@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   Dimensions,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -17,6 +18,12 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CELL_GAP = 8;
 const H_PAD = SPACING.md * 2;
 const CELL_SIZE = Math.floor((SCREEN_WIDTH - H_PAD - CELL_GAP * (COLS - 1)) / COLS);
+
+const BADGE_IMAGES = {
+  30: require('../../assets/badge-thirty.png'),
+  60: require('../../assets/badge-sixty.png'),
+  90: require('../../assets/badge-ninety.png'),
+} as const;
 
 const PHASES = [
   { label: 'PHASE 1', start: 1,  end: 30, checkpoint: 30 },
@@ -187,18 +194,17 @@ export default function HistoryScreen() {
 
               {/* Checkpoint badge */}
               {reached && (
-                <View style={[styles.badge, perfect && styles.badgePerfect]}>
-                  <Text style={styles.badgeIcon}>{perfect ? '🏆' : '📍'}</Text>
-                  <View>
-                    <Text style={[styles.badgeTitle, perfect && styles.badgeTitlePerfect]}>
-                      {phase.checkpoint}-DAY{perfect ? ' WARRIOR' : ' CHECKPOINT'}
+                <View style={styles.badgeWrap}>
+                  <Image
+                    source={BADGE_IMAGES[phase.checkpoint as keyof typeof BADGE_IMAGES]}
+                    style={styles.badgeImage}
+                    resizeMode="contain"
+                  />
+                  {!perfect && (
+                    <Text style={styles.badgeIncomplete}>
+                      Complete all {phase.checkpoint} days without missing one to earn this badge
                     </Text>
-                    <Text style={styles.badgeSub}>
-                      {perfect
-                        ? `All ${phase.checkpoint} days completed flawlessly`
-                        : `You reached day ${phase.checkpoint}`}
-                    </Text>
-                  </View>
+                  )}
                 </View>
               )}
 
@@ -280,30 +286,22 @@ const styles = StyleSheet.create({
   },
   cellNum: { fontSize: FONTS.sizes.sm, fontWeight: '700' },
   cellCheck: { fontSize: 9, color: COLORS.textPrimary, position: 'absolute', bottom: 3, right: 5 },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.sm,
+  badgeWrap: {
     marginTop: SPACING.md,
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 8,
-    padding: SPACING.md,
+    alignItems: 'center',
   },
-  badgePerfect: {
-    backgroundColor: COLORS.redDeep,
-    borderColor: COLORS.red,
+  badgeImage: {
+    width: '100%',
+    height: 180,
+    borderRadius: 12,
   },
-  badgeIcon: { fontSize: 28 },
-  badgeTitle: {
-    fontSize: FONTS.sizes.sm,
-    fontWeight: '800',
-    color: COLORS.textSecondary,
-    letterSpacing: 1,
+  badgeIncomplete: {
+    fontSize: FONTS.sizes.xs,
+    color: COLORS.textMuted,
+    textAlign: 'center',
+    marginTop: SPACING.sm,
+    fontStyle: 'italic',
   },
-  badgeTitlePerfect: { color: COLORS.redBright },
-  badgeSub: { fontSize: FONTS.sizes.xs, color: COLORS.textMuted, marginTop: 2 },
   phaseDivider: { height: 1, backgroundColor: COLORS.border, marginVertical: SPACING.lg },
   legend: { flexDirection: 'row', flexWrap: 'wrap', marginTop: SPACING.sm },
 });

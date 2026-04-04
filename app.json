@@ -5,6 +5,12 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
+    "icon": "./assets/logo-ritual.png",
+    "splash": {
+      "image": "./assets/logo-ritual.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0A0A"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.theritual.app"
@@ -12,6 +18,7 @@
     "android": {
       "package": "com.theritual.app",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/logo-ritual.png",
         "backgroundColor": "#0A0A0A"
       }
     }
