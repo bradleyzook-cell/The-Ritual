@@ -4,73 +4,89 @@ import {
   Text,
   ScrollView,
   StyleSheet,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useRitual } from '../context/RitualContext';
 import { COLORS, SPACING, FONTS } from '../constants/theme';
-import {
-  getTodayString,
-  isPast,
-  isToday,
-  groupIntoWeeks,
-  getLastNDays,
-  formatShortDate,
-} from '../utils/dateUtils';
+import { getTodayString, addDays, isToday } from '../utils/dateUtils';
 
-const DOT_SIZE = 36;
-const DOT_GAP = 4;
-const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const COLS = 5;
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CELL_GAP = 8;
+const H_PAD = SPACING.md * 2;
+const CELL_SIZE = Math.floor((SCREEN_WIDTH - H_PAD - CELL_GAP * (COLS - 1)) / COLS);
 
-type DayStatus = 'complete' | 'missed' | 'inProgress' | 'upcoming' | 'preStart';
+const PHASES = [
+  { label: 'PHASE 1', start: 1,  end: 30, checkpoint: 30 },
+  { label: 'PHASE 2', start: 31, end: 60, checkpoint: 60 },
+  { label: 'PHASE 3', start: 61, end: 90, checkpoint: 90 },
+];
 
-function getDayStatus(
-  date: string | null,
+type DayStatus = 'complete' | 'missed' | 'today' | 'upcoming';
+
+function getStatus(
+  dayNum: number,
   startDate: string,
   days: Record<string, { isComplete: boolean }>
 ): DayStatus {
-  if (!date) return 'upcoming';
-  if (date > getTodayString()) return 'upcoming';
-  if (date < startDate) return 'preStart';
-  if (isToday(date)) {
-    return days[date]?.isComplete ? 'complete' : 'inProgress';
-  }
-  if (isPast(date)) {
-    return days[date]?.isComplete ? 'complete' : 'missed';
-  }
-  return 'upcoming';
+  const date = addDays(startDate, dayNum - 1);
+  const today = getTodayString();
+  if (date > today) return 'upcoming';
+  if (isToday(date)) return days[date]?.isComplete ? 'complete' : 'today';
+  return days[date]?.isComplete ? 'complete' : 'missed';
 }
 
-function dotColor(status: DayStatus): string {
+function cellStyle(status: DayStatus) {
   switch (status) {
-    case 'complete':   return COLORS.red;
-    case 'missed':     return COLORS.redDeep;
-    case 'inProgress': return COLORS.redDark;
-    case 'upcoming':   return COLORS.surface;
-    case 'preStart':   return COLORS.background;
-    default:           return COLORS.surface;
+    case 'complete':  return { bg: COLORS.red,       border: COLORS.redBright };
+    case 'missed':    return { bg: COLORS.redDeep,   border: COLORS.redDeep };
+    case 'today':     return { bg: 'transparent',    border: COLORS.redBright };
+    case 'upcoming':  return { bg: COLORS.surface,   border: COLORS.border };
   }
 }
 
-function dotBorder(status: DayStatus): string {
+function cellTextColor(status: DayStatus): string {
   switch (status) {
-    case 'complete':   return COLORS.redBright;
-    case 'missed':     return COLORS.redDeep;
-    case 'inProgress': return COLORS.redDark;
-    case 'upcoming':   return COLORS.border;
-    case 'preStart':   return 'transparent';
-    default:           return COLORS.border;
+    case 'complete':  return COLORS.textPrimary;
+    case 'missed':    return COLORS.redDark;
+    case 'today':     return COLORS.redBright;
+    case 'upcoming':  return COLORS.textMuted;
   }
+}
+
+function chunkIntoRows(start: number, end: number): number[][] {
+  const days = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  const rows: number[][] = [];
+  for (let i = 0; i < days.length; i += COLS) {
+    rows.push(days.slice(i, i + COLS));
+  }
+  return rows;
+}
+
+function phaseCompleted(
+  start: number,
+  end: number,
+  startDate: string,
+  days: Record<string, { isComplete: boolean }>
+): boolean {
+  for (let d = start; d <= end; d++) {
+    const date = addDays(startDate, d - 1);
+    if (!days[date]?.isComplete) return false;
+  }
+  return true;
 }
 
 export default function HistoryScreen() {
-  const { data, loading, currentStreak, bestStreak, totalCompleteDays } = useRitual();
-
-  const weeks = useMemo(() => {
-    if (!data) return [];
-    const days = getLastNDays(77); // 11 weeks
-    return groupIntoWeeks(days);
-  }, [data]);
+  const {
+    data,
+    loading,
+    currentStreak,
+    bestStreak,
+    totalCompleteDays,
+    dayNumber,
+  } = useRitual();
 
   if (loading || !data) {
     return (
@@ -82,11 +98,11 @@ export default function HistoryScreen() {
     );
   }
 
-  const startDate = data.settings.startDate;
-  const oldestDate = weeks.length > 0 ? (weeks[0].find(Boolean) ?? null) : null;
-  const newestDate = weeks.length > 0
-    ? ([...weeks[weeks.length - 1]].reverse().find(Boolean) ?? null)
-    : null;
+  const { startDate, days } = { startDate: data.settings.startDate, days: data.days };
+
+  // Only show phases the user has reached or started
+  const visiblePhases = PHASES.filter((p) => dayNumber >= p.start);
+  if (visiblePhases.length === 0) visiblePhases.push(PHASES[0]);
 
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
@@ -97,154 +113,138 @@ export default function HistoryScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>YOUR JOURNEY</Text>
-          {oldestDate && newestDate && (
-            <Text style={styles.dateRange}>
-              {formatShortDate(oldestDate as string)} — {formatShortDate(newestDate as string)}
-            </Text>
-          )}
+          <Text style={styles.subtitle}>30 · 60 · 90 Day Challenge</Text>
         </View>
 
-        {/* Streak summary */}
+        {/* Stats strip */}
         <View style={styles.statRow}>
           <View style={styles.statBox}>
             <Text style={styles.statValue}>🔥 {currentStreak}</Text>
-            <Text style={styles.statLabel}>CURRENT STREAK</Text>
+            <Text style={styles.statLabel}>STREAK</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.statBox}>
             <Text style={styles.statValue}>{bestStreak}</Text>
-            <Text style={styles.statLabel}>BEST STREAK</Text>
+            <Text style={styles.statLabel}>BEST</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.statBox}>
             <Text style={styles.statValue}>{totalCompleteDays}</Text>
-            <Text style={styles.statLabel}>TOTAL DAYS</Text>
+            <Text style={styles.statLabel}>COMPLETE</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.statBox}>
+            <Text style={[styles.statValue, { color: COLORS.red }]}>
+              {dayNumber}
+            </Text>
+            <Text style={styles.statLabel}>DAY</Text>
           </View>
         </View>
 
-        {/* Calendar grid */}
-        <View style={styles.grid}>
-          {/* Day-of-week labels */}
-          <View style={styles.dayLabelsRow}>
-            {DAY_LABELS.map((label, i) => (
-              <Text key={i} style={styles.dayLabel}>
-                {label}
-              </Text>
-            ))}
-          </View>
+        {/* Phase grids */}
+        {visiblePhases.map((phase, pi) => {
+          const rows = chunkIntoRows(phase.start, phase.end);
+          const reached = dayNumber >= phase.checkpoint;
+          const perfect = reached && phaseCompleted(phase.start, phase.end, startDate, days);
 
-          {/* Week rows */}
-          {weeks.map((week, wi) => (
-            <View key={wi} style={styles.weekRow}>
-              {week.map((date, di) => {
-                const status = getDayStatus(date, startDate, data.days);
-                return (
-                  <View
-                    key={di}
-                    style={[
-                      styles.dot,
-                      {
-                        backgroundColor: dotColor(status),
-                        borderColor: dotBorder(status),
-                      },
-                      isToday(date ?? '') && styles.dotToday,
-                    ]}
-                  >
-                    {isToday(date ?? '') && (
-                      <View style={styles.dotTodayInner} />
-                    )}
+          return (
+            <View key={phase.label} style={styles.phaseBlock}>
+              {/* Phase label */}
+              <View style={styles.phaseHeader}>
+                <Text style={styles.phaseLabel}>{phase.label}</Text>
+                <Text style={styles.phaseDays}>
+                  DAYS {phase.start}–{phase.end}
+                </Text>
+              </View>
+
+              {/* Day grid */}
+              <View style={styles.grid}>
+                {rows.map((row, ri) => (
+                  <View key={ri} style={styles.row}>
+                    {row.map((dayNum) => {
+                      const status = getStatus(dayNum, startDate, days);
+                      const cs = cellStyle(status);
+                      return (
+                        <View
+                          key={dayNum}
+                          style={[
+                            styles.cell,
+                            { backgroundColor: cs.bg, borderColor: cs.border },
+                          ]}
+                        >
+                          <Text style={[styles.cellNum, { color: cellTextColor(status) }]}>
+                            {dayNum}
+                          </Text>
+                          {status === 'complete' && (
+                            <Text style={styles.cellCheck}>✓</Text>
+                          )}
+                        </View>
+                      );
+                    })}
                   </View>
-                );
-              })}
+                ))}
+              </View>
+
+              {/* Checkpoint badge */}
+              {reached && (
+                <View style={[styles.badge, perfect && styles.badgePerfect]}>
+                  <Text style={styles.badgeIcon}>{perfect ? '🏆' : '📍'}</Text>
+                  <View>
+                    <Text style={[styles.badgeTitle, perfect && styles.badgeTitlePerfect]}>
+                      {phase.checkpoint}-DAY{perfect ? ' WARRIOR' : ' CHECKPOINT'}
+                    </Text>
+                    <Text style={styles.badgeSub}>
+                      {perfect
+                        ? `All ${phase.checkpoint} days completed flawlessly`
+                        : `You reached day ${phase.checkpoint}`}
+                    </Text>
+                  </View>
+                </View>
+              )}
+
+              {/* Phase divider */}
+              {pi < visiblePhases.length - 1 && (
+                <View style={styles.phaseDivider} />
+              )}
             </View>
-          ))}
-        </View>
+          );
+        })}
 
         {/* Legend */}
         <View style={styles.legend}>
-          <LegendItem color={COLORS.red} border={COLORS.redBright} label="Complete" />
-          <LegendItem color={COLORS.redDeep} border={COLORS.redDeep} label="Missed" />
-          <LegendItem color={COLORS.redDark} border={COLORS.redDark} label="In Progress" />
-          <LegendItem color={COLORS.surface} border={COLORS.border} label="Upcoming" />
+          <LegendItem color={COLORS.red}     border={COLORS.redBright} label="Complete" />
+          <LegendItem color="transparent"    border={COLORS.redBright} label="Today" />
+          <LegendItem color={COLORS.redDeep} border={COLORS.redDeep}   label="Missed" />
+          <LegendItem color={COLORS.surface} border={COLORS.border}     label="Upcoming" />
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function LegendItem({
-  color,
-  border,
-  label,
-}: {
-  color: string;
-  border: string;
-  label: string;
-}) {
+function LegendItem({ color, border, label }: { color: string; border: string; label: string }) {
   return (
     <View style={legendStyles.item}>
-      <View
-        style={[legendStyles.dot, { backgroundColor: color, borderColor: border }]}
-      />
+      <View style={[legendStyles.dot, { backgroundColor: color, borderColor: border }]} />
       <Text style={legendStyles.label}>{label}</Text>
     </View>
   );
 }
 
 const legendStyles = StyleSheet.create({
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: SPACING.md,
-    marginBottom: SPACING.xs,
-  },
-  dot: {
-    width: 12,
-    height: 12,
-    borderRadius: 3,
-    borderWidth: 1,
-    marginRight: 6,
-  },
-  label: {
-    fontSize: FONTS.sizes.xs,
-    color: COLORS.textSecondary,
-  },
+  item: { flexDirection: 'row', alignItems: 'center', marginRight: SPACING.md, marginBottom: SPACING.xs },
+  dot:  { width: 12, height: 12, borderRadius: 3, borderWidth: 1, marginRight: 6 },
+  label: { fontSize: FONTS.sizes.xs, color: COLORS.textSecondary },
 });
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  loading: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingText: {
-    color: COLORS.textMuted,
-    fontSize: FONTS.sizes.sm,
-    letterSpacing: 2,
-  },
-  scroll: {
-    paddingHorizontal: SPACING.md,
-    paddingBottom: SPACING.xxl,
-  },
-  header: {
-    paddingTop: SPACING.lg,
-    paddingBottom: SPACING.md,
-  },
-  title: {
-    fontSize: FONTS.sizes.xxl,
-    fontWeight: '900',
-    color: COLORS.textPrimary,
-    letterSpacing: 4,
-  },
-  dateRange: {
-    fontSize: FONTS.sizes.sm,
-    color: COLORS.textMuted,
-    marginTop: 4,
-  },
+  root: { flex: 1, backgroundColor: COLORS.background },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  loadingText: { color: COLORS.textMuted, fontSize: FONTS.sizes.sm, letterSpacing: 2 },
+  scroll: { paddingHorizontal: SPACING.md, paddingBottom: SPACING.xxl },
+  header: { paddingTop: SPACING.lg, paddingBottom: SPACING.md },
+  title: { fontSize: FONTS.sizes.xxl, fontWeight: '900', color: COLORS.textPrimary, letterSpacing: 4 },
+  subtitle: { fontSize: FONTS.sizes.sm, color: COLORS.textMuted, marginTop: 2 },
   statRow: {
     flexDirection: 'row',
     backgroundColor: COLORS.surface,
@@ -255,68 +255,55 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     alignItems: 'center',
   },
-  statBox: {
-    flex: 1,
+  statBox: { flex: 1, alignItems: 'center' },
+  statValue: { fontSize: FONTS.sizes.lg, fontWeight: '800', color: COLORS.textPrimary },
+  statLabel: { fontSize: FONTS.sizes.xs, color: COLORS.textMuted, letterSpacing: 1, marginTop: 2 },
+  divider: { width: 1, height: 32, backgroundColor: COLORS.border },
+  phaseBlock: { marginBottom: SPACING.md },
+  phaseHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
-  statValue: {
-    fontSize: FONTS.sizes.lg,
-    fontWeight: '800',
-    color: COLORS.textPrimary,
-  },
-  statLabel: {
-    fontSize: FONTS.sizes.xs,
-    color: COLORS.textMuted,
-    letterSpacing: 1,
-    marginTop: 2,
-  },
-  divider: {
-    width: 1,
-    height: 32,
-    backgroundColor: COLORS.border,
-  },
-  grid: {
-    marginBottom: SPACING.lg,
-  },
-  dayLabelsRow: {
-    flexDirection: 'row',
-    marginBottom: DOT_GAP,
-  },
-  dayLabel: {
-    width: DOT_SIZE,
-    marginRight: DOT_GAP,
-    textAlign: 'center',
-    fontSize: FONTS.sizes.xs,
-    color: COLORS.textMuted,
-    fontWeight: '600',
-    letterSpacing: 1,
-  },
-  weekRow: {
-    flexDirection: 'row',
-    marginBottom: DOT_GAP,
-  },
-  dot: {
-    width: DOT_SIZE,
-    height: DOT_SIZE,
-    borderRadius: 6,
+  phaseLabel: { fontSize: FONTS.sizes.sm, fontWeight: '800', color: COLORS.red, letterSpacing: 2 },
+  phaseDays: { fontSize: FONTS.sizes.xs, color: COLORS.textMuted },
+  grid: { gap: CELL_GAP },
+  row: { flexDirection: 'row', gap: CELL_GAP },
+  cell: {
+    width: CELL_SIZE,
+    height: CELL_SIZE,
+    borderRadius: 8,
     borderWidth: 1,
-    marginRight: DOT_GAP,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dotToday: {
-    borderWidth: 2,
-    borderColor: COLORS.redBright,
-  },
-  dotTodayInner: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: COLORS.redBright,
-  },
-  legend: {
+  cellNum: { fontSize: FONTS.sizes.sm, fontWeight: '700' },
+  cellCheck: { fontSize: 9, color: COLORS.textPrimary, position: 'absolute', bottom: 3, right: 5 },
+  badge: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: SPACING.xs,
+    alignItems: 'center',
+    gap: SPACING.sm,
+    marginTop: SPACING.md,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    padding: SPACING.md,
   },
+  badgePerfect: {
+    backgroundColor: COLORS.redDeep,
+    borderColor: COLORS.red,
+  },
+  badgeIcon: { fontSize: 28 },
+  badgeTitle: {
+    fontSize: FONTS.sizes.sm,
+    fontWeight: '800',
+    color: COLORS.textSecondary,
+    letterSpacing: 1,
+  },
+  badgeTitlePerfect: { color: COLORS.redBright },
+  badgeSub: { fontSize: FONTS.sizes.xs, color: COLORS.textMuted, marginTop: 2 },
+  phaseDivider: { height: 1, backgroundColor: COLORS.border, marginVertical: SPACING.lg },
+  legend: { flexDirection: 'row', flexWrap: 'wrap', marginTop: SPACING.sm },
 });
