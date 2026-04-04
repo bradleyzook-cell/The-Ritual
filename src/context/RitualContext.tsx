@@ -10,6 +10,7 @@ import { RitualContextType, RitualData, TaskId, UserSettings } from '../types';
 import {
   loadData,
   toggleTaskInStorage,
+  completeDayInStorage,
   updateSettingsInStorage,
   resetAllData,
 } from '../utils/storage';
@@ -34,11 +35,17 @@ export function RitualProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const toggleTask = useCallback(async (taskId: TaskId) => {
-    const updated = await toggleTaskInStorage(
-      getTodayString(),
-      taskId,
-      TASK_IDS
-    );
+    const updated = await toggleTaskInStorage(getTodayString(), taskId, TASK_IDS);
+    setData(updated);
+  }, []);
+
+  const toggleTaskForDate = useCallback(async (date: string, taskId: TaskId) => {
+    const updated = await toggleTaskInStorage(date, taskId, TASK_IDS);
+    setData(updated);
+  }, []);
+
+  const completeDay = useCallback(async (date: string) => {
+    const updated = await completeDayInStorage(date, TASK_IDS);
     setData(updated);
   }, []);
 
@@ -134,6 +141,8 @@ export function RitualProvider({ children }: { children: React.ReactNode }) {
     data,
     loading,
     toggleTask,
+    toggleTaskForDate,
+    completeDay,
     saveSettings,
     resetData,
     currentStreak,

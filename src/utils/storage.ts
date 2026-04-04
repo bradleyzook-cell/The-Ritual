@@ -74,6 +74,24 @@ export async function updateSettingsInStorage(
   return updated;
 }
 
+export async function completeDayInStorage(
+  date: string,
+  allTaskIds: TaskId[]
+): Promise<RitualData> {
+  const data = await loadData();
+  const completedTasks: Partial<Record<TaskId, boolean>> = {};
+  for (const id of allTaskIds) completedTasks[id] = true;
+  const updated: RitualData = {
+    ...data,
+    days: {
+      ...data.days,
+      [date]: { date, completedTasks, isComplete: true },
+    },
+  };
+  await saveData(updated);
+  return updated;
+}
+
 export async function resetAllData(): Promise<RitualData> {
   const fresh = getDefaultData();
   await saveData(fresh);

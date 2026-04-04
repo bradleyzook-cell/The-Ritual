@@ -8,6 +8,7 @@ import {
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useRitual } from '../context/RitualContext';
 import { COLORS, SPACING, FONTS } from '../constants/theme';
@@ -221,9 +222,11 @@ export default function HistoryScreen() {
                         ]}>
                           {day.dayOfMonth}
                         </Text>
-                        {/* Checkpoint dot */}
+                        {/* Checkpoint marker */}
                         {(day.challengeDay === 30 || day.challengeDay === 60 || day.challengeDay === 90) && (
-                          <View style={styles.checkpointDot} />
+                          day.isComplete
+                            ? <Ionicons name="ribbon" size={10} color={COLORS.textPrimary} style={styles.checkpointIcon} />
+                            : <View style={styles.checkpointDot} />
                         )}
                       </View>
                     </View>
@@ -381,6 +384,10 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
     backgroundColor: COLORS.redBright,
+  },
+  checkpointIcon: {
+    position: 'absolute',
+    bottom: 2,
   },
 
   badgeWrap: {

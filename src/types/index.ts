@@ -36,6 +36,8 @@ export interface RitualContextType {
   data: RitualData | null;
   loading: boolean;
   toggleTask: (taskId: TaskId) => Promise<void>;
+  toggleTaskForDate: (date: string, taskId: TaskId) => Promise<void>;
+  completeDay: (date: string) => Promise<void>;
   saveSettings: (settings: UserSettings) => Promise<void>;
   resetData: () => Promise<void>;
   currentStreak: number;

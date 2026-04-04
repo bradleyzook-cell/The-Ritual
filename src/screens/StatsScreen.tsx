@@ -4,13 +4,30 @@ import {
   Text,
   ScrollView,
   StyleSheet,
+  Image,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useRitual } from '../context/RitualContext';
 import { TASKS, TASK_IDS } from '../constants/tasks';
 import { COLORS, SPACING, FONTS } from '../constants/theme';
-import { getTodayString, getDaysBetween } from '../utils/dateUtils';
+import { getTodayString, getDaysBetween, addDays, formatShortDate } from '../utils/dateUtils';
+
+const BADGE_IMAGES = {
+  30: require('../../assets/badge-thirty.png'),
+  60: require('../../assets/badge-sixty.png'),
+  90: require('../../assets/badge-ninety.png'),
+} as const;
+
+const BADGE_CHECKPOINTS = [
+  { label: 'PHASE 1', checkpoint: 30 as const },
+  { label: 'PHASE 2', checkpoint: 60 as const },
+  { label: 'PHASE 3', checkpoint: 90 as const },
+];
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const BADGE_CARD_SIZE = Math.floor((SCREEN_WIDTH - SPACING.md * 2 - SPACING.sm * 2) / 3);
 
 export default function StatsScreen() {
   const {
@@ -103,6 +120,28 @@ export default function StatsScreen() {
             </Text>
             <Text style={styles.statLabel}>COMPLETION RATE</Text>
           </View>
+        </View>
+
+        {/* Badges */}
+        <Text style={styles.sectionTitle}>BADGES</Text>
+        <View style={styles.badgeRow}>
+          {BADGE_CHECKPOINTS.map(({ label, checkpoint }) => {
+            const earned = dayNumber >= checkpoint;
+            const targetDate = addDays(data.settings.startDate, checkpoint - 1);
+            return (
+              <View key={checkpoint} style={styles.badgeCard}>
+                <Image
+                  source={BADGE_IMAGES[checkpoint]}
+                  style={[styles.badgeImg, !earned && styles.badgeImgDim]}
+                  resizeMode="contain"
+                />
+                <Text style={styles.badgeLabel}>{label}</Text>
+                <Text style={[styles.badgeStatus, earned && styles.badgeStatusEarned]}>
+                  {earned ? 'EARNED' : formatShortDate(targetDate)}
+                </Text>
+              </View>
+            );
+          })}
         </View>
 
         {/* Task breakdown */}
@@ -208,6 +247,44 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     textAlign: 'center',
     marginTop: SPACING.sm,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginBottom: SPACING.lg,
+  },
+  badgeCard: {
+    width: BADGE_CARD_SIZE,
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: SPACING.sm,
+  },
+  badgeImg: {
+    width: BADGE_CARD_SIZE - SPACING.sm * 2,
+    height: BADGE_CARD_SIZE - SPACING.sm * 2,
+  },
+  badgeImgDim: {
+    opacity: 0.2,
+  },
+  badgeLabel: {
+    fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textMuted,
+    letterSpacing: 1,
+    marginTop: SPACING.xs,
+  },
+  badgeStatus: {
+    fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
+  badgeStatusEarned: {
+    color: COLORS.red,
+    fontFamily: FONTS.bodyBold,
   },
   gridRow: {
     flexDirection: 'row',

@@ -8,7 +8,14 @@ import {
   Modal,
   Pressable,
   Image,
+  FlatList,
 } from 'react-native';
+
+const BADGE_IMAGES: Record<number, ReturnType<typeof require>> = {
+  30: require('../../assets/badge-thirty.png'),
+  60: require('../../assets/badge-sixty.png'),
+  90: require('../../assets/badge-ninety.png'),
+};
 import * as Haptics from 'expo-haptics';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -16,7 +23,7 @@ import { useRitual } from '../context/RitualContext';
 import TaskItem from '../components/TaskItem';
 import { TASKS } from '../constants/tasks';
 import { COLORS, SPACING, FONTS } from '../constants/theme';
-import { formatDisplayDate, getTodayString, subtractDays } from '../utils/dateUtils';
+import { formatDisplayDate, getTodayString, subtractDays, formatShortDate } from '../utils/dateUtils';
 import { TaskId } from '../types';
 
 const COMPLETION_PHRASES = [
@@ -30,11 +37,15 @@ const COMPLETION_PHRASES = [
   'FORGED BY INTENTION.',
 ];
 
+type FailPhase = 'fail' | 'integrity';
+
 export default function TodayScreen() {
   const {
     data,
     loading,
     toggleTask,
+    toggleTaskForDate,
+    completeDay,
     currentStreak,
     dayNumber,
     todayProgress,
@@ -43,6 +54,10 @@ export default function TodayScreen() {
 
   const [showCompletion, setShowCompletion] = useState(false);
   const prevCompleteRef = useRef(false);
+
+  // Failure modal state
+  const [failPhase, setFailPhase] = useState<FailPhase | null>(null);
+  const failShownRef = useRef(false);
 
   // Show completion screen when last task is checked off
   useEffect(() => {
@@ -74,6 +89,38 @@ export default function TodayScreen() {
     );
   }, [data, currentStreak, isTodayComplete]);
 
+  // Show failure modal once per session when streak is broken
+  useEffect(() => {
+    if (streakBroken && !failShownRef.current && !loading) {
+      failShownRef.current = true;
+      setFailPhase('fail');
+    }
+  }, [streakBroken, loading]);
+
+  const yesterday = subtractDays(getTodayString(), 1);
+
+  // Yesterday's task completion state (for integrity check)
+  const yesterdayLog = data?.days[yesterday];
+  const yesterdayTasks = yesterdayLog?.completedTasks ?? {};
+  const allYesterdayDone = TASKS.every((t) => !!yesterdayTasks[t.id]);
+
+  // Auto-close integrity modal once all yesterday's tasks are checked
+  useEffect(() => {
+    if (failPhase === 'integrity' && allYesterdayDone) {
+      setFailPhase(null);
+    }
+  }, [failPhase, allYesterdayDone]);
+
+  const handleToggleYesterday = useCallback(
+    async (taskId: TaskId) => {
+      if (Platform.OS !== 'web') {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+      await toggleTaskForDate(yesterday, taskId);
+    },
+    [toggleTaskForDate, yesterday]
+  );
+
   const completionPhrase =
     COMPLETION_PHRASES[(dayNumber - 1) % COMPLETION_PHRASES.length];
 
@@ -97,6 +144,87 @@ export default function TodayScreen() {
 
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
+      {/* ── Failure Modal ── */}
+      <Modal
+        visible={failPhase !== null}
+        animationType="fade"
+        transparent={false}
+        statusBarTranslucent
+      >
+        <SafeAreaView style={fail.root}>
+          {failPhase === 'fail' && (
+            <View style={fail.content}>
+              <Text style={fail.skull}>💀</Text>
+              <Text style={fail.heading}>YOU FAILED.</Text>
+              <View style={fail.bar} />
+              <Text style={fail.sub}>
+                {formatShortDate(yesterday)} was not completed.{'\n'}
+                A WARRior owns it — no excuses.
+              </Text>
+              <Text style={fail.question}>What happened?</Text>
+
+              <Pressable
+                style={({ pressed }) => [fail.btnIntegrity, pressed && { opacity: 0.8 }]}
+                onPress={() => setFailPhase('integrity')}
+              >
+                <Text style={fail.btnIntegrityText}>I DID THE WORK</Text>
+                <Text style={fail.btnIntegritySub}>Check off what you completed — on your honor</Text>
+              </Pressable>
+
+              <Pressable
+                style={({ pressed }) => [fail.btnRestart, pressed && { opacity: 0.8 }]}
+                onPress={() => setFailPhase(null)}
+              >
+                <Text style={fail.btnRestartText}>RESTART THE RITUAL</Text>
+                <Text style={fail.btnRestartSub}>Accept the failure. Begin again as Day 1.</Text>
+              </Pressable>
+            </View>
+          )}
+
+          {failPhase === 'integrity' && (
+            <View style={fail.root}>
+              <View style={fail.integrityHeader}>
+                <Pressable onPress={() => setFailPhase('fail')} style={fail.backBtn}>
+                  <Text style={fail.backText}>← BACK</Text>
+                </Pressable>
+                <Text style={fail.integrityTitle}>ON YOUR HONOR</Text>
+              </View>
+              <Text style={fail.integrityNote}>
+                Check off what you actually completed on {formatShortDate(yesterday)}.{'\n'}
+                If you didn't do it — don't check it.{'\n'}This is between you and the iron.
+              </Text>
+              <ScrollView style={fail.taskList} contentContainerStyle={{ paddingHorizontal: SPACING.md, paddingBottom: SPACING.xxl }}>
+                {TASKS.map((task) => {
+                  const done = !!yesterdayTasks[task.id];
+                  return (
+                    <Pressable
+                      key={task.id}
+                      style={({ pressed }) => [
+                        fail.taskRow,
+                        done && fail.taskRowDone,
+                        pressed && { opacity: 0.75 },
+                      ]}
+                      onPress={() => handleToggleYesterday(task.id)}
+                    >
+                      <Text style={fail.taskIcon}>{task.icon}</Text>
+                      <Text style={[fail.taskTitle, done && fail.taskTitleDone]} numberOfLines={1}>
+                        {task.title}
+                      </Text>
+                      <View style={[fail.checkbox, done && fail.checkboxDone]}>
+                        {done && <Text style={fail.checkmark}>✓</Text>}
+                      </View>
+                    </Pressable>
+                  );
+                })}
+                <Text style={fail.integrityFooter}>
+                  Once all 8 are checked, your streak will be restored.
+                </Text>
+              </ScrollView>
+            </View>
+          )}
+        </SafeAreaView>
+      </Modal>
+
       {/* ── Day Completion Modal ── */}
       <Modal
         visible={showCompletion}
@@ -120,6 +248,17 @@ export default function TodayScreen() {
             <View style={completion.bar} />
             <Text style={completion.completeText}>COMPLETE</Text>
             <View style={completion.bar} />
+
+            {/* Badge unlock on checkpoint days */}
+            {BADGE_IMAGES[dayNumber] && (
+              <View style={completion.badgeWrap}>
+                <Image
+                  source={BADGE_IMAGES[dayNumber]}
+                  style={completion.badgeImg}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
 
             <Text style={completion.phrase}>{completionPhrase}</Text>
 
@@ -163,17 +302,6 @@ export default function TodayScreen() {
             <Text style={styles.streakCount}>{currentStreak}</Text>
           </View>
         </View>
-
-        {/* Streak broken banner */}
-        {streakBroken && (
-          <View style={styles.resetBanner}>
-            <Text style={styles.resetTitle}>YOUR RITUAL RESET</Text>
-            <Text style={styles.resetBody}>
-              You missed a day. A WARRior acknowledges and resets.{'\n'}
-              Today is Day 1. Start again with intention.
-            </Text>
-          </View>
-        )}
 
         {/* Day + Progress */}
         <View style={styles.progressSection}>
@@ -309,6 +437,196 @@ const completion = StyleSheet.create({
     color: COLORS.textPrimary,
     letterSpacing: 3,
   },
+  badgeWrap: {
+    marginVertical: SPACING.md,
+    alignItems: 'center',
+  },
+  badgeImg: {
+    width: 200,
+    height: 200,
+  },
+});
+
+// ── Failure modal styles ──
+const fail = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.xl,
+  },
+  skull: {
+    fontSize: 64,
+    marginBottom: SPACING.md,
+  },
+  heading: {
+    fontSize: FONTS.sizes.xxxl,
+    fontFamily: FONTS.heading,
+    color: COLORS.textPrimary,
+    letterSpacing: 6,
+    marginBottom: SPACING.md,
+  },
+  bar: {
+    width: 60,
+    height: 3,
+    backgroundColor: COLORS.red,
+    marginBottom: SPACING.lg,
+  },
+  sub: {
+    fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.body,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: SPACING.sm,
+  },
+  question: {
+    fontSize: FONTS.sizes.lg,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.red,
+    letterSpacing: 1,
+    marginBottom: SPACING.xxl,
+  },
+  btnIntegrity: {
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.red,
+    borderRadius: 10,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.lg,
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: SPACING.md,
+  },
+  btnIntegrityText: {
+    fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textPrimary,
+    letterSpacing: 2,
+  },
+  btnIntegritySub: {
+    fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
+    color: COLORS.textMuted,
+    marginTop: 4,
+  },
+  btnRestart: {
+    backgroundColor: COLORS.redDeep,
+    borderWidth: 1,
+    borderColor: COLORS.redDark,
+    borderRadius: 10,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.lg,
+    alignItems: 'center',
+    width: '100%',
+  },
+  btnRestartText: {
+    fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.redBright,
+    letterSpacing: 2,
+  },
+  btnRestartSub: {
+    fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
+    color: COLORS.textMuted,
+    marginTop: 4,
+  },
+  // Integrity phase
+  integrityHeader: {
+    paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.lg,
+    paddingBottom: SPACING.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+  },
+  backBtn: {
+    paddingVertical: SPACING.xs,
+    paddingRight: SPACING.sm,
+  },
+  backText: {
+    fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.red,
+    letterSpacing: 1,
+  },
+  integrityTitle: {
+    fontSize: FONTS.sizes.lg,
+    fontFamily: FONTS.heading,
+    color: COLORS.textPrimary,
+    letterSpacing: 3,
+  },
+  integrityNote: {
+    fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.body,
+    color: COLORS.textSecondary,
+    lineHeight: 22,
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.lg,
+  },
+  taskList: {
+    flex: 1,
+  },
+  taskRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: SPACING.md,
+    marginBottom: SPACING.sm,
+  },
+  taskRowDone: {
+    borderColor: COLORS.redDark,
+    backgroundColor: COLORS.redDeep,
+  },
+  taskIcon: {
+    fontSize: 20,
+    width: 32,
+    marginRight: SPACING.sm,
+  },
+  taskTitle: {
+    flex: 1,
+    fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.body,
+    color: COLORS.textSecondary,
+  },
+  taskTitleDone: {
+    color: COLORS.textPrimary,
+    fontFamily: FONTS.bodyBold,
+  },
+  checkbox: {
+    width: 26,
+    height: 26,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: COLORS.borderStrong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxDone: {
+    backgroundColor: COLORS.red,
+    borderColor: COLORS.red,
+  },
+  checkmark: {
+    color: COLORS.textPrimary,
+    fontSize: 14,
+    fontFamily: FONTS.bodyBold,
+  },
+  integrityFooter: {
+    fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
+    color: COLORS.textMuted,
+    textAlign: 'center',
+    marginTop: SPACING.md,
+    fontStyle: 'italic',
+  },
 });
 
 // ── Main screen styles ──
@@ -366,27 +684,6 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
     lineHeight: 26,
-  },
-  resetBanner: {
-    backgroundColor: COLORS.redDeep,
-    borderWidth: 1,
-    borderColor: COLORS.red,
-    borderRadius: 8,
-    padding: SPACING.md,
-    marginBottom: SPACING.md,
-  },
-  resetTitle: {
-    fontSize: FONTS.sizes.md,
-    fontFamily: FONTS.heading,
-    color: COLORS.redBright,
-    letterSpacing: 2,
-    marginBottom: SPACING.xs,
-  },
-  resetBody: {
-    fontSize: FONTS.sizes.sm,
-    fontFamily: FONTS.body,
-    color: COLORS.textSecondary,
-    lineHeight: 20,
   },
   progressSection: {
     marginBottom: SPACING.md,

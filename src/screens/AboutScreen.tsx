@@ -5,8 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   Image,
+  Pressable,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONTS } from '../constants/theme';
 
 const STEPS = [
@@ -98,11 +101,25 @@ export default function AboutScreen() {
         {/* Footer */}
         <View style={styles.footer}>
           <View style={styles.footerDivider} />
-          <Image
-            source={require('../../assets/logo-warrbuilt.png')}
-            style={styles.warrbuiltLogo}
-            resizeMode="contain"
-          />
+          <View style={styles.footerBrand}>
+            <Pressable
+              onPress={() => Linking.openURL('https://www.warrbuilt.com')}
+              style={({ pressed }) => [styles.logoWrap, pressed && { opacity: 0.7 }]}
+            >
+              <Image
+                source={require('../../assets/logo-warrbuilt.png')}
+                style={styles.warrbuiltLogo}
+                resizeMode="contain"
+              />
+            </Pressable>
+            <Pressable
+              onPress={() => Linking.openURL('https://www.instagram.com/warrbuilt')}
+              style={({ pressed }) => [styles.igBtn, pressed && { opacity: 0.7 }]}
+            >
+              <Ionicons name="logo-instagram" size={28} color="#E1306C" />
+              <Text style={styles.igHandle}>@warrbuilt</Text>
+            </Pressable>
+          </View>
           <Text style={styles.footerText}>
             WARRBuilt focuses on helping men identify their tribe and become who they are meant to be.
           </Text>
@@ -231,11 +248,30 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.red,
     marginBottom: SPACING.lg,
   },
+  footerBrand: {
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+    gap: SPACING.md,
+  },
+  logoWrap: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+  },
   warrbuiltLogo: {
     width: 200,
-    height: 60,
-    alignSelf: 'center',
-    marginBottom: SPACING.md,
+    height: 52,
+  },
+  igBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  igHandle: {
+    fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.bodyBold,
+    color: '#E1306C',
   },
   footerText: {
     fontSize: FONTS.sizes.sm,
