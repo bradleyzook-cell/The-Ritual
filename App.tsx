@@ -8,10 +8,11 @@ import { RitualProvider } from './src/context/RitualContext';
 import TodayScreen from './src/screens/TodayScreen';
 import HistoryScreen from './src/screens/HistoryScreen';
 import StatsScreen from './src/screens/StatsScreen';
+import AboutScreen from './src/screens/AboutScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import { COLORS, FONTS } from './src/constants/theme';
 
-type Tab = 'Today' | 'History' | 'Stats' | 'Settings';
+type Tab = 'Today' | 'History' | 'Stats' | 'About' | 'Settings';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -20,10 +21,11 @@ const TAB_CONFIG: {
   icon: IoniconName;
   iconActive: IoniconName;
 }[] = [
-  { name: 'Today',    icon: 'flame-outline',       iconActive: 'flame' },
-  { name: 'History',  icon: 'calendar-outline',    iconActive: 'calendar' },
-  { name: 'Stats',    icon: 'stats-chart-outline', iconActive: 'stats-chart' },
-  { name: 'Settings', icon: 'settings-outline',    iconActive: 'settings' },
+  { name: 'Today',    icon: 'flame-outline',              iconActive: 'flame' },
+  { name: 'History',  icon: 'calendar-outline',          iconActive: 'calendar' },
+  { name: 'Stats',    icon: 'stats-chart-outline',       iconActive: 'stats-chart' },
+  { name: 'About',    icon: 'book-outline',              iconActive: 'book' },
+  { name: 'Settings', icon: 'settings-outline',          iconActive: 'settings' },
 ];
 
 export default function App() {
@@ -39,6 +41,7 @@ export default function App() {
             {activeTab === 'Today'    && <TodayScreen />}
             {activeTab === 'History'  && <HistoryScreen />}
             {activeTab === 'Stats'    && <StatsScreen />}
+            {activeTab === 'About'    && <AboutScreen />}
             {activeTab === 'Settings' && <SettingsScreen />}
           </View>
 
