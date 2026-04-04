@@ -11,13 +11,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useRitual } from '../context/RitualContext';
 import { COLORS, SPACING, FONTS } from '../constants/theme';
-import { getTodayString, addDays, isToday } from '../utils/dateUtils';
+import { getTodayString, addDays, formatDate, parseDate } from '../utils/dateUtils';
 
-const COLS = 5;
+const DOW_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CELL_GAP = 8;
-const H_PAD = SPACING.md * 2;
-const CELL_SIZE = Math.floor((SCREEN_WIDTH - H_PAD - CELL_GAP * (COLS - 1)) / COLS);
+const H_PAD = SPACING.md;
+const CELL_SIZE = Math.floor((SCREEN_WIDTH - H_PAD * 2) / 7);
 
 const BADGE_IMAGES = {
   30: require('../../assets/badge-thirty.png'),
@@ -26,59 +25,96 @@ const BADGE_IMAGES = {
 } as const;
 
 const PHASES = [
-  { label: 'PHASE 1', start: 1,  end: 30, checkpoint: 30 },
-  { label: 'PHASE 2', start: 31, end: 60, checkpoint: 60 },
-  { label: 'PHASE 3', start: 61, end: 90, checkpoint: 90 },
+  { label: 'PHASE 1', checkpoint: 30 as const },
+  { label: 'PHASE 2', checkpoint: 60 as const },
+  { label: 'PHASE 3', checkpoint: 90 as const },
 ];
 
-type DayStatus = 'complete' | 'missed' | 'today' | 'upcoming';
+interface CalDay {
+  dateStr: string;
+  dayOfMonth: number;
+  challengeDay: number; // 1-90 if in challenge, 0 otherwise
+  isComplete: boolean;
+  isMissed: boolean;
+  isToday: boolean;
+  isFuture: boolean;
+}
 
-function getStatus(
-  dayNum: number,
+interface CalMonth {
+  year: number;
+  month: number;          // 0-indexed
+  monthName: string;
+  weeks: (CalDay | null)[][];
+  /** Challenge days that are checkpoints (30/60/90) within this month */
+  checkpoints: number[];
+}
+
+function buildCalendar(
   startDate: string,
   days: Record<string, { isComplete: boolean }>
-): DayStatus {
-  const date = addDays(startDate, dayNum - 1);
+): CalMonth[] {
   const today = getTodayString();
-  if (date > today) return 'upcoming';
-  if (isToday(date)) return days[date]?.isComplete ? 'complete' : 'today';
-  return days[date]?.isComplete ? 'complete' : 'missed';
-}
+  const endDate = addDays(startDate, 89); // day 90
 
-function cellStyle(status: DayStatus) {
-  switch (status) {
-    case 'complete':  return { bg: COLORS.red,       border: COLORS.redBright };
-    case 'missed':    return { bg: COLORS.redDeep,   border: COLORS.redDeep };
-    case 'today':     return { bg: 'transparent',    border: COLORS.redBright };
-    case 'upcoming':  return { bg: COLORS.surface,   border: COLORS.border };
-  }
-}
+  const startD = parseDate(startDate);
+  const endD = parseDate(endDate);
 
-function cellTextColor(status: DayStatus): string {
-  switch (status) {
-    case 'complete':  return COLORS.textPrimary;
-    case 'missed':    return COLORS.redDark;
-    case 'today':     return COLORS.redBright;
-    case 'upcoming':  return COLORS.textMuted;
-  }
-}
+  // Enumerate all calendar months that the challenge spans
+  const months: CalMonth[] = [];
+  let cur = new Date(startD.getFullYear(), startD.getMonth(), 1);
+  const endMonth = new Date(endD.getFullYear(), endD.getMonth(), 1);
 
-function chunkIntoRows(start: number, end: number): number[][] {
-  const days = Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  const rows: number[][] = [];
-  for (let i = 0; i < days.length; i += COLS) {
-    rows.push(days.slice(i, i + COLS));
+  while (cur <= endMonth) {
+    const year = cur.getFullYear();
+    const month = cur.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
+
+    const checkpoints: number[] = [];
+    const allDays: (CalDay | null)[] = Array(firstDow).fill(null);
+
+    for (let dom = 1; dom <= daysInMonth; dom++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(dom).padStart(2, '0')}`;
+      const diffMs = parseDate(dateStr).getTime() - parseDate(startDate).getTime();
+      const diff = Math.round(diffMs / 86400000);
+      const challengeDay = diff >= 0 && diff <= 89 ? diff + 1 : 0;
+
+      if (challengeDay === 30 || challengeDay === 60 || challengeDay === 90) {
+        checkpoints.push(challengeDay);
+      }
+
+      const isComplete = !!days[dateStr]?.isComplete;
+      const isFuture = dateStr > today;
+      const isToday = dateStr === today;
+      const isMissed = challengeDay > 0 && dateStr < today && !isComplete && !isToday;
+
+      allDays.push({ dateStr, dayOfMonth: dom, challengeDay, isComplete, isMissed, isToday, isFuture });
+    }
+
+    // Pad last week
+    while (allDays.length % 7 !== 0) allDays.push(null);
+
+    const weeks: (CalDay | null)[][] = [];
+    for (let i = 0; i < allDays.length; i += 7) {
+      weeks.push(allDays.slice(i, i + 7) as (CalDay | null)[]);
+    }
+
+    const monthName = new Date(year, month, 1).toLocaleString('en-US', { month: 'long' });
+    months.push({ year, month, monthName, weeks, checkpoints });
+
+    cur = new Date(year, month + 1, 1);
   }
-  return rows;
+
+  return months;
 }
 
 function phaseCompleted(
-  start: number,
-  end: number,
+  checkpoint: number,
   startDate: string,
   days: Record<string, { isComplete: boolean }>
 ): boolean {
-  for (let d = start; d <= end; d++) {
+  const start = checkpoint - 29;
+  for (let d = start; d <= checkpoint; d++) {
     const date = addDays(startDate, d - 1);
     if (!days[date]?.isComplete) return false;
   }
@@ -95,6 +131,11 @@ export default function HistoryScreen() {
     dayNumber,
   } = useRitual();
 
+  const calendar = useMemo(() => {
+    if (!data) return [];
+    return buildCalendar(data.settings.startDate, data.days);
+  }, [data]);
+
   if (loading || !data) {
     return (
       <SafeAreaView style={styles.root}>
@@ -106,10 +147,6 @@ export default function HistoryScreen() {
   }
 
   const { startDate, days } = { startDate: data.settings.startDate, days: data.days };
-
-  // Only show phases the user has reached or started
-  const visiblePhases = PHASES.filter((p) => dayNumber >= p.start);
-  if (visiblePhases.length === 0) visiblePhases.push(PHASES[0]);
 
   return (
     <SafeAreaView style={styles.root} edges={['top']}>
@@ -141,87 +178,89 @@ export default function HistoryScreen() {
           </View>
           <View style={styles.divider} />
           <View style={styles.statBox}>
-            <Text style={[styles.statValue, { color: COLORS.red }]}>
-              {dayNumber}
-            </Text>
+            <Text style={[styles.statValue, { color: COLORS.red }]}>{dayNumber}</Text>
             <Text style={styles.statLabel}>DAY</Text>
           </View>
         </View>
 
-        {/* Phase grids */}
-        {visiblePhases.map((phase, pi) => {
-          const rows = chunkIntoRows(phase.start, phase.end);
-          const reached = dayNumber >= phase.checkpoint;
-          const perfect = reached && phaseCompleted(phase.start, phase.end, startDate, days);
+        {/* Calendar months */}
+        {calendar.map(({ year, month, monthName, weeks, checkpoints }) => (
+          <View key={`${year}-${month}`} style={styles.monthBlock}>
+            <Text style={styles.monthLabel}>{monthName} {year}</Text>
 
-          return (
-            <View key={phase.label} style={styles.phaseBlock}>
-              {/* Phase label */}
-              <View style={styles.phaseHeader}>
-                <Text style={styles.phaseLabel}>{phase.label}</Text>
-                <Text style={styles.phaseDays}>
-                  DAYS {phase.start}–{phase.end}
-                </Text>
+            {/* Day-of-week headers */}
+            <View style={styles.weekRow}>
+              {DOW_LABELS.map((d, i) => (
+                <View key={i} style={styles.cell}>
+                  <Text style={styles.dowLabel}>{d}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Weeks */}
+            {weeks.map((week, wi) => (
+              <View key={wi} style={styles.weekRow}>
+                {week.map((day, di) => {
+                  if (!day) return <View key={di} style={styles.cell} />;
+                  return (
+                    <View key={di} style={styles.cell}>
+                      <View style={[
+                        styles.dayCell,
+                        day.challengeDay > 0 && styles.dayCellInChallenge,
+                        day.isComplete && styles.dayCellComplete,
+                        day.isMissed && styles.dayCellMissed,
+                        day.isToday && !day.isComplete && styles.dayCellToday,
+                      ]}>
+                        <Text style={[
+                          styles.dayNum,
+                          day.challengeDay > 0 && styles.dayNumInChallenge,
+                          day.isComplete && styles.dayNumComplete,
+                          day.isMissed && styles.dayNumMissed,
+                          day.isToday && !day.isComplete && styles.dayNumToday,
+                          day.isFuture && day.challengeDay > 0 && styles.dayNumFuture,
+                        ]}>
+                          {day.dayOfMonth}
+                        </Text>
+                        {/* Checkpoint dot */}
+                        {(day.challengeDay === 30 || day.challengeDay === 60 || day.challengeDay === 90) && (
+                          <View style={styles.checkpointDot} />
+                        )}
+                      </View>
+                    </View>
+                  );
+                })}
               </View>
+            ))}
 
-              {/* Day grid */}
-              <View style={styles.grid}>
-                {rows.map((row, ri) => (
-                  <View key={ri} style={styles.row}>
-                    {row.map((dayNum) => {
-                      const status = getStatus(dayNum, startDate, days);
-                      const cs = cellStyle(status);
-                      return (
-                        <View
-                          key={dayNum}
-                          style={[
-                            styles.cell,
-                            { backgroundColor: cs.bg, borderColor: cs.border },
-                          ]}
-                        >
-                          <Text style={[styles.cellNum, { color: cellTextColor(status) }]}>
-                            {dayNum}
-                          </Text>
-                          {status === 'complete' && (
-                            <Text style={styles.cellCheck}>✓</Text>
-                          )}
-                        </View>
-                      );
-                    })}
-                  </View>
-                ))}
-              </View>
-
-              {/* Checkpoint badge */}
-              {reached && (
-                <View style={styles.badgeWrap}>
+            {/* Phase badges that fall within this month */}
+            {checkpoints.map((cp) => {
+              const reached = dayNumber >= cp;
+              const perfect = reached && phaseCompleted(cp, startDate, days);
+              if (!reached) return null;
+              return (
+                <View key={cp} style={styles.badgeWrap}>
                   <Image
-                    source={BADGE_IMAGES[phase.checkpoint as keyof typeof BADGE_IMAGES]}
+                    source={BADGE_IMAGES[cp as keyof typeof BADGE_IMAGES]}
                     style={styles.badgeImage}
                     resizeMode="contain"
                   />
                   {!perfect && (
                     <Text style={styles.badgeIncomplete}>
-                      Complete all {phase.checkpoint} days without missing one to earn this badge
+                      Complete all {cp} days without missing one to earn this badge
                     </Text>
                   )}
                 </View>
-              )}
-
-              {/* Phase divider */}
-              {pi < visiblePhases.length - 1 && (
-                <View style={styles.phaseDivider} />
-              )}
-            </View>
-          );
-        })}
+              );
+            })}
+          </View>
+        ))}
 
         {/* Legend */}
         <View style={styles.legend}>
           <LegendItem color={COLORS.red}     border={COLORS.redBright} label="Complete" />
-          <LegendItem color="transparent"    border={COLORS.redBright} label="Today" />
+          <LegendItem color="transparent"    border={COLORS.red}       label="Today" />
           <LegendItem color={COLORS.redDeep} border={COLORS.redDeep}   label="Missed" />
-          <LegendItem color={COLORS.surface} border={COLORS.border}     label="Upcoming" />
+          <LegendItem color={COLORS.surface} border={COLORS.border}    label="Upcoming" />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -238,19 +277,21 @@ function LegendItem({ color, border, label }: { color: string; border: string; l
 }
 
 const legendStyles = StyleSheet.create({
-  item: { flexDirection: 'row', alignItems: 'center', marginRight: SPACING.md, marginBottom: SPACING.xs },
-  dot:  { width: 12, height: 12, borderRadius: 3, borderWidth: 1, marginRight: 6 },
+  item:  { flexDirection: 'row', alignItems: 'center', marginRight: SPACING.md, marginBottom: SPACING.xs },
+  dot:   { width: 12, height: 12, borderRadius: 6, borderWidth: 1.5, marginRight: 6 },
   label: { fontSize: FONTS.sizes.xs, fontFamily: FONTS.body, color: COLORS.textSecondary },
 });
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: COLORS.background },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  root:        { flex: 1, backgroundColor: COLORS.background },
+  loading:     { flex: 1, alignItems: 'center', justifyContent: 'center' },
   loadingText: { color: COLORS.textMuted, fontFamily: FONTS.body, fontSize: FONTS.sizes.sm, letterSpacing: 2 },
-  scroll: { paddingHorizontal: SPACING.md, paddingBottom: SPACING.xxl },
-  header: { paddingTop: SPACING.lg, paddingBottom: SPACING.md },
-  title: { fontSize: FONTS.sizes.xxl, fontFamily: FONTS.heading, color: COLORS.textPrimary, letterSpacing: 4 },
+  scroll:      { paddingHorizontal: H_PAD, paddingBottom: SPACING.xxl },
+
+  header:   { paddingTop: SPACING.lg, paddingBottom: SPACING.md },
+  title:    { fontSize: FONTS.sizes.xxl, fontFamily: FONTS.heading, color: COLORS.textPrimary, letterSpacing: 4 },
   subtitle: { fontSize: FONTS.sizes.sm, fontFamily: FONTS.body, color: COLORS.textMuted, marginTop: 2 },
+
   statRow: {
     flexDirection: 'row',
     backgroundColor: COLORS.surface,
@@ -261,31 +302,87 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     alignItems: 'center',
   },
-  statBox: { flex: 1, alignItems: 'center' },
+  statBox:   { flex: 1, alignItems: 'center' },
   statValue: { fontSize: FONTS.sizes.lg, fontFamily: FONTS.heading, color: COLORS.textPrimary },
   statLabel: { fontSize: FONTS.sizes.xs, fontFamily: FONTS.body, color: COLORS.textMuted, letterSpacing: 1, marginTop: 2 },
-  divider: { width: 1, height: 32, backgroundColor: COLORS.border },
-  phaseBlock: { marginBottom: SPACING.md },
-  phaseHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  divider:   { width: 1, height: 32, backgroundColor: COLORS.border },
+
+  monthBlock: { marginBottom: SPACING.xl },
+  monthLabel: {
+    fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textSecondary,
+    letterSpacing: 1,
     marginBottom: SPACING.sm,
   },
-  phaseLabel: { fontSize: FONTS.sizes.sm, fontFamily: FONTS.bodyBold, color: COLORS.red, letterSpacing: 2 },
-  phaseDays: { fontSize: FONTS.sizes.xs, fontFamily: FONTS.body, color: COLORS.textMuted },
-  grid: { gap: CELL_GAP },
-  row: { flexDirection: 'row', gap: CELL_GAP },
-  cell: {
-    width: CELL_SIZE,
-    height: CELL_SIZE,
-    borderRadius: 8,
-    borderWidth: 1,
+
+  weekRow: { flexDirection: 'row' },
+  cell:    { width: CELL_SIZE, height: CELL_SIZE, alignItems: 'center', justifyContent: 'center' },
+  dowLabel: {
+    fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textMuted,
+    letterSpacing: 0.5,
+  },
+
+  dayCell: {
+    width: CELL_SIZE - 4,
+    height: CELL_SIZE - 4,
+    borderRadius: (CELL_SIZE - 4) / 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cellNum: { fontSize: FONTS.sizes.sm, fontFamily: FONTS.bodyBold },
-  cellCheck: { fontSize: 9, color: COLORS.textPrimary, position: 'absolute', bottom: 3, right: 5 },
+  dayCellInChallenge: {
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  dayCellComplete: {
+    backgroundColor: COLORS.red,
+    borderColor: COLORS.redBright,
+  },
+  dayCellMissed: {
+    backgroundColor: COLORS.redDeep,
+    borderColor: COLORS.redDeep,
+  },
+  dayCellToday: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: COLORS.red,
+  },
+
+  dayNum: {
+    fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.body,
+    color: COLORS.textMuted,
+  },
+  dayNumInChallenge: {
+    color: COLORS.textSecondary,
+  },
+  dayNumComplete: {
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textPrimary,
+  },
+  dayNumMissed: {
+    color: COLORS.redMuted,
+  },
+  dayNumToday: {
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.red,
+  },
+  dayNumFuture: {
+    color: COLORS.textMuted,
+  },
+
+  checkpointDot: {
+    position: 'absolute',
+    bottom: 2,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: COLORS.redBright,
+  },
+
   badgeWrap: {
     marginTop: SPACING.md,
     alignItems: 'center',
@@ -303,6 +400,6 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
     fontStyle: 'italic',
   },
-  phaseDivider: { height: 1, backgroundColor: COLORS.border, marginVertical: SPACING.lg },
+
   legend: { flexDirection: 'row', flexWrap: 'wrap', marginTop: SPACING.sm },
 });
