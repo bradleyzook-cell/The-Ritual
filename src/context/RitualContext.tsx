@@ -106,11 +106,15 @@ export function RitualProvider({ children }: { children: React.ReactNode }) {
     return Object.values(data.days).filter((d) => d.isComplete).length;
   }, [data]);
 
+  // Day number is streak-based: miss a day = back to Day 1
   const dayNumber = useMemo((): number => {
     if (!data) return 1;
-    const diff = getDaysBetween(data.settings.startDate, getTodayString());
-    return Math.max(1, diff + 1);
-  }, [data]);
+    const today = getTodayString();
+    const todayDone = !!data.days[today]?.isComplete;
+    // If today is complete, you're on that streak day
+    // If today is in progress, you're working toward streak + 1
+    return Math.max(1, todayDone ? currentStreak : currentStreak + 1);
+  }, [data, currentStreak]);
 
   const todayProgress = useMemo((): { completed: number; total: number } => {
     if (!data) return { completed: 0, total: TOTAL_TASKS };
