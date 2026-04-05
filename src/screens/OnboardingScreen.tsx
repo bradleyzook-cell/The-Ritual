@@ -430,6 +430,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: SPACING.md,
     alignItems: 'center',
+    alignSelf: 'stretch',
   },
   btnText: {
     fontSize: FONTS.sizes.md,
