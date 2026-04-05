@@ -111,10 +111,9 @@ export async function completeOnboardingInStorage(
 }
 
 export async function resetAllData(): Promise<RitualData> {
-  const existing = await loadData();
   const fresh: RitualData = {
     ...getDefaultData(),
-    hasOnboarded: existing.hasOnboarded ?? false, // don't re-trigger onboarding on reset
+    hasOnboarded: false,
   };
   await saveData(fresh);
   return fresh;
