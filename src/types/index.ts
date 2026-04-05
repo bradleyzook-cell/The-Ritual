@@ -30,6 +30,7 @@ export interface UserSettings {
 export interface RitualData {
   settings: UserSettings;
   days: Record<string, DayLog>;
+  hasOnboarded?: boolean;
 }
 
 export interface RitualContextType {
@@ -38,6 +39,7 @@ export interface RitualContextType {
   toggleTask: (taskId: TaskId) => Promise<void>;
   toggleTaskForDate: (date: string, taskId: TaskId) => Promise<void>;
   completeDay: (date: string) => Promise<void>;
+  completeOnboarding: (name: string, wakeTime: string) => Promise<void>;
   saveSettings: (settings: UserSettings) => Promise<void>;
   resetData: () => Promise<void>;
   currentStreak: number;

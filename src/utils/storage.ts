@@ -92,8 +92,30 @@ export async function completeDayInStorage(
   return updated;
 }
 
+export async function completeOnboardingInStorage(
+  name: string,
+  wakeTime: string
+): Promise<RitualData> {
+  const data = await loadData();
+  const updated: RitualData = {
+    ...data,
+    hasOnboarded: true,
+    settings: {
+      ...data.settings,
+      name,
+      wakeTime: wakeTime || '06:00',
+    },
+  };
+  await saveData(updated);
+  return updated;
+}
+
 export async function resetAllData(): Promise<RitualData> {
-  const fresh = getDefaultData();
+  const existing = await loadData();
+  const fresh: RitualData = {
+    ...getDefaultData(),
+    hasOnboarded: existing.hasOnboarded ?? false, // don't re-trigger onboarding on reset
+  };
   await saveData(fresh);
   return fresh;
 }
