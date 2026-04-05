@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sizes.xxxl,
     fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
-    lineHeight: FONTS.sizes.xxxl + 4,
+    lineHeight: FONTS.sizes.xxxl + 16,
   },
   streakLabel: {
     fontSize: FONTS.sizes.sm,
