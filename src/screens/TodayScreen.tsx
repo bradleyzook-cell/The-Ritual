@@ -377,7 +377,7 @@ const completion = StyleSheet.create({
     fontSize: 96,
     fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
-    lineHeight: 100,
+    lineHeight: 116,
   },
   bar: {
     width: 80,
