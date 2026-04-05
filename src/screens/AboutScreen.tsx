@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sizes.xxxl,
     fontFamily: FONTS.heading,
     color: COLORS.redDeep,
-    lineHeight: FONTS.sizes.xxxl,
+    lineHeight: FONTS.sizes.xxxl + 16,
     width: 52,
   },
   stepTitle: {
