@@ -31,6 +31,9 @@ export interface RitualData {
   settings: UserSettings;
   days: Record<string, DayLog>;
   hasOnboarded?: boolean;
+  totalStarts?: number;
+  successfulRuns?: number;
+  bestDaysEver?: number;
 }
 
 export interface RitualContextType {
@@ -49,4 +52,8 @@ export interface RitualContextType {
   dayNumber: number;
   todayProgress: { completed: number; total: number };
   isTodayComplete: boolean;
+  badgesEarned: number;
+  nextBadge: { checkpoint: number; date: string } | null;
+  completionRate: number;
+  bestDaysEver: number;
 }

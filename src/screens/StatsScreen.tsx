@@ -33,19 +33,11 @@ export default function StatsScreen() {
   const {
     data,
     loading,
-    currentStreak,
-    bestStreak,
-    totalCompleteDays,
     dayNumber,
+    badgesEarned,
+    nextBadge,
+    completionRate,
   } = useRitual();
-
-  const completionRate = useMemo(() => {
-    if (!data) return 0;
-    const today = getTodayString();
-    const daysSinceStart = getDaysBetween(data.settings.startDate, today) + 1;
-    if (daysSinceStart <= 0) return 0;
-    return Math.round((totalCompleteDays / daysSinceStart) * 100);
-  }, [data, totalCompleteDays]);
 
   const taskBreakdown = useMemo(() => {
     if (!data) return [];
@@ -88,31 +80,17 @@ export default function StatsScreen() {
           ) : null}
         </View>
 
-        {/* Streak hero */}
-        <View style={styles.streakHero}>
-          <Text style={styles.streakFire}>🔥</Text>
-          <Text style={styles.streakNumber}>{currentStreak}</Text>
-          <Text style={styles.streakLabel}>CURRENT STREAK</Text>
-          {currentStreak === 0 && (
-            <Text style={styles.streakSub}>Complete all 8 tasks today to start your streak</Text>
-          )}
+        {/* Day hero */}
+        <View style={styles.dayHero}>
+          <Text style={styles.dayNumber}>{dayNumber}</Text>
+          <Text style={styles.dayLabel}>DAY</Text>
         </View>
 
-        {/* Stats grid */}
+        {/* Badges + Completion Rate row */}
         <View style={styles.gridRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>{bestStreak}</Text>
-            <Text style={styles.statLabel}>BEST STREAK</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{totalCompleteDays}</Text>
-            <Text style={styles.statLabel}>DAYS COMPLETE</Text>
-          </View>
-        </View>
-        <View style={styles.gridRow}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{dayNumber}</Text>
-            <Text style={styles.statLabel}>DAY NUMBER</Text>
+            <Text style={styles.statValue}>{badgesEarned} / 3</Text>
+            <Text style={styles.statLabel}>BADGES EARNED</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={[styles.statValue, completionRate >= 80 && styles.statValueGood]}>
@@ -120,6 +98,19 @@ export default function StatsScreen() {
             </Text>
             <Text style={styles.statLabel}>COMPLETION RATE</Text>
           </View>
+        </View>
+
+        {/* Next badge date */}
+        <View style={styles.nextBadgeCard}>
+          {nextBadge ? (
+            <>
+              <Text style={styles.nextBadgeLabel}>NEXT BADGE</Text>
+              <Text style={styles.nextBadgeCheckpoint}>DAY {nextBadge.checkpoint}</Text>
+              <Text style={styles.nextBadgeDate}>{nextBadge.date}</Text>
+            </>
+          ) : (
+            <Text style={styles.nextBadgeLabel}>ALL BADGES EARNED</Text>
+          )}
         </View>
 
         {/* Badges */}
@@ -215,7 +206,7 @@ const styles = StyleSheet.create({
     color: COLORS.red,
     letterSpacing: 1,
   },
-  streakHero: {
+  dayHero: {
     backgroundColor: COLORS.redDeep,
     borderWidth: 1,
     borderColor: COLORS.redDark,
@@ -224,29 +215,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: SPACING.md,
   },
-  streakFire: {
-    fontSize: 36,
-    marginBottom: SPACING.xs,
-  },
-  streakNumber: {
+  dayNumber: {
     fontSize: FONTS.sizes.xxxl,
     fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
     lineHeight: FONTS.sizes.xxxl + 16,
   },
-  streakLabel: {
+  dayLabel: {
     fontSize: FONTS.sizes.sm,
     fontFamily: FONTS.bodyBold,
     color: COLORS.red,
     letterSpacing: 2,
     marginTop: SPACING.xs,
   },
-  streakSub: {
+  nextBadgeCard: {
+    backgroundColor: COLORS.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: SPACING.md,
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  nextBadgeLabel: {
     fontSize: FONTS.sizes.xs,
     fontFamily: FONTS.body,
     color: COLORS.textMuted,
-    textAlign: 'center',
-    marginTop: SPACING.sm,
+    letterSpacing: 1,
+  },
+  nextBadgeCheckpoint: {
+    fontSize: FONTS.sizes.xl,
+    fontFamily: FONTS.heading,
+    color: COLORS.textPrimary,
+    lineHeight: FONTS.sizes.xl + 10,
+    marginTop: 2,
+  },
+  nextBadgeDate: {
+    fontSize: FONTS.sizes.sm,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.red,
+    marginTop: 2,
   },
   badgeRow: {
     flexDirection: 'row',

@@ -100,6 +100,9 @@ export async function completeOnboardingInStorage(
   const updated: RitualData = {
     ...data,
     hasOnboarded: true,
+    totalStarts: (data.totalStarts ?? 0) + 1,
+    successfulRuns: data.successfulRuns ?? 0,
+    bestDaysEver: data.bestDaysEver ?? 0,
     settings: {
       ...data.settings,
       name,
@@ -112,13 +115,18 @@ export async function completeOnboardingInStorage(
 
 export async function restartRitualInStorage(): Promise<RitualData> {
   const existing = await loadData();
+  const completeDaysInRun = Object.values(existing.days).filter((d) => d.isComplete).length;
+  const wasSuccessful = completeDaysInRun >= 30;
   const fresh: RitualData = {
     settings: {
       ...existing.settings,
-      startDate: getTodayString(), // anchor calendar to today
+      startDate: getTodayString(),
     },
     days: {},
-    hasOnboarded: true, // preserve — they don't need to re-onboard
+    hasOnboarded: true,
+    totalStarts: (existing.totalStarts ?? 1) + 1,
+    successfulRuns: (existing.successfulRuns ?? 0) + (wasSuccessful ? 1 : 0),
+    bestDaysEver: Math.max(existing.bestDaysEver ?? 0, completeDaysInRun),
   };
   await saveData(fresh);
   return fresh;

@@ -126,10 +126,8 @@ export default function HistoryScreen() {
   const {
     data,
     loading,
-    currentStreak,
-    bestStreak,
-    totalCompleteDays,
     dayNumber,
+    bestDaysEver,
   } = useRitual();
 
   const calendar = useMemo(() => {
@@ -164,23 +162,13 @@ export default function HistoryScreen() {
         {/* Stats strip */}
         <View style={styles.statRow}>
           <View style={styles.statBox}>
-            <Text style={styles.statValue}>🔥 {currentStreak}</Text>
-            <Text style={styles.statLabel}>STREAK</Text>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>{bestStreak}</Text>
-            <Text style={styles.statLabel}>BEST</Text>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.statBox}>
-            <Text style={styles.statValue}>{totalCompleteDays}</Text>
-            <Text style={styles.statLabel}>COMPLETE</Text>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.statBox}>
             <Text style={[styles.statValue, { color: COLORS.red }]}>{dayNumber}</Text>
             <Text style={styles.statLabel}>DAY</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statValue}>{bestDaysEver}</Text>
+            <Text style={styles.statLabel}>BEST</Text>
           </View>
         </View>
 

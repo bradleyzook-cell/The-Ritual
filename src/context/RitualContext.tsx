@@ -20,10 +20,15 @@ import {
   getTodayString,
   subtractDays,
   getDaysBetween,
+  addDays,
+  parseDate,
 } from '../utils/dateUtils';
 import { TASK_IDS, TOTAL_TASKS } from '../constants/tasks';
 
 const RitualContext = createContext<RitualContextType | null>(null);
+
+const BADGE_CHECKPOINTS = [30, 60, 90];
+const ALL_CHECKPOINTS = [30, 60, 90, 365];
 
 export function RitualProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<RitualData | null>(null);
@@ -149,6 +154,41 @@ export function RitualProvider({ children }: { children: React.ReactNode }) {
     return !!data.days[getTodayString()]?.isComplete;
   }, [data]);
 
+  // Number of badge checkpoints definitively passed (dayNumber strictly greater)
+  const badgesEarned = useMemo((): number => {
+    return BADGE_CHECKPOINTS.filter((cp) => dayNumber > cp).length;
+  }, [dayNumber]);
+
+  // Next checkpoint not yet passed, with the projected calendar date
+  const nextBadge = useMemo((): { checkpoint: number; date: string } | null => {
+    const nextCp = ALL_CHECKPOINTS.find((cp) => dayNumber <= cp);
+    if (!nextCp) return null;
+    const today = getTodayString();
+    // daysUntil uses +1 so "day 1 today → day 30 badge on today+30"
+    const daysUntil = nextCp - dayNumber + 1;
+    const targetDateStr = addDays(today, daysUntil);
+    const date = parseDate(targetDateStr).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    return { checkpoint: nextCp, date };
+  }, [dayNumber]);
+
+  // completionRate = successfulRuns / totalStarts × 100
+  const completionRate = useMemo((): number => {
+    if (!data) return 0;
+    const total = data.totalStarts ?? 1;
+    const successful = data.successfulRuns ?? 0;
+    return Math.round((successful / total) * 100);
+  }, [data]);
+
+  // Best day count ever, persisted across restarts
+  const bestDaysEver = useMemo((): number => {
+    if (!data) return 0;
+    return Math.max(data.bestDaysEver ?? 0, totalCompleteDays);
+  }, [data, totalCompleteDays]);
+
   const value: RitualContextType = {
     data,
     loading,
@@ -165,6 +205,10 @@ export function RitualProvider({ children }: { children: React.ReactNode }) {
     dayNumber,
     todayProgress,
     isTodayComplete,
+    badgesEarned,
+    nextBadge,
+    completionRate,
+    bestDaysEver,
   };
 
   return (
