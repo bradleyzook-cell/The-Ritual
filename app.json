@@ -5,18 +5,29 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
+    "scheme": "theritual",
     "icon": "./assets/logo-ritual.png",
     "splash": {
       "image": "./assets/logo-ritual.png",
       "resizeMode": "contain",
       "backgroundColor": "#0A0A0A"
     },
+    "plugins": [
+      "expo-font",
+      "expo-haptics"
+    ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.theritual.app"
+      "bundleIdentifier": "com.warrbuilt.theritual",
+      "buildNumber": "1",
+      "infoPlist": {
+        "UIRequiresFullScreen": true,
+        "LSApplicationQueriesSchemes": ["instagram", "instagram-stories"]
+      }
     },
     "android": {
-      "package": "com.theritual.app",
+      "package": "com.warrbuilt.theritual",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/logo-ritual.png",
         "backgroundColor": "#0A0A0A"
