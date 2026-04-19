@@ -163,7 +163,7 @@ export default function TodayScreen() {
         <SafeAreaView style={fail.root}>
           {failPhase === 'fail' && (
             <View style={fail.content}>
-              <Text style={fail.skull}>💀</Text>
+              <Text style={fail.failMark}>✕</Text>
               <Text style={fail.heading}>{abandoned ? 'WHERE HAVE\nYOU BEEN?' : 'YOU FAILED.'}</Text>
               <View style={fail.bar} />
               <Text style={fail.sub}>
@@ -474,9 +474,13 @@ const fail = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: SPACING.xl,
   },
-  skull: {
-    fontSize: 64,
-    marginBottom: SPACING.md,
+  failMark: {
+    fontSize: 72,
+    fontFamily: FONTS.heading,
+    color: COLORS.red,
+    lineHeight: 88,
+    marginBottom: SPACING.sm,
+    textAlign: 'center',
   },
   heading: {
     fontSize: FONTS.sizes.xxxl,
@@ -484,6 +488,7 @@ const fail = StyleSheet.create({
     color: COLORS.textPrimary,
     letterSpacing: 6,
     marginBottom: SPACING.md,
+    textAlign: 'center',
   },
   bar: {
     width: 60,
