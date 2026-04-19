@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useRitual } from '../context/RitualContext';
-import { TASKS, TASK_IDS } from '../constants/tasks';
+import { TASKS } from '../constants/tasks';
 import { COLORS, SPACING, FONTS } from '../constants/theme';
 import { getTodayString, getDaysBetween, addDays, formatShortDate } from '../utils/dateUtils';
 
@@ -20,10 +20,12 @@ const BADGE_IMAGES = {
   90: require('../../assets/badge-ninety.png'),
 } as const;
 
-const BADGE_CHECKPOINTS = [
-  { label: 'PHASE 1', checkpoint: 30 as const },
-  { label: 'PHASE 2', checkpoint: 60 as const },
-  { label: 'PHASE 3', checkpoint: 90 as const },
+type KnownCheckpoint = 30 | 60 | 90;
+
+const KNOWN_BADGES: { label: string; checkpoint: KnownCheckpoint }[] = [
+  { label: 'PHASE 1', checkpoint: 30 },
+  { label: 'PHASE 2', checkpoint: 60 },
+  { label: 'PHASE 3', checkpoint: 90 },
 ];
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -93,20 +95,6 @@ export default function StatsScreen() {
           <Text style={styles.dayLabel}>DAY</Text>
         </View>
 
-        {/* Badges + Completion Rate row */}
-        <View style={styles.gridRow}>
-          <View style={styles.statCard}>
-            <Text style={styles.statValue}>{badgesEarned} / 3</Text>
-            <Text style={styles.statLabel}>BADGES EARNED</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={[styles.statValue, completionRate >= 80 && styles.statValueGood]}>
-              {completionRate}%
-            </Text>
-            <Text style={styles.statLabel}>COMPLETION RATE</Text>
-          </View>
-        </View>
-
         {/* Next badge date */}
         <View style={styles.nextBadgeCard}>
           {nextBadge ? (
@@ -120,10 +108,28 @@ export default function StatsScreen() {
           )}
         </View>
 
+        {/* Badges Earned + Completion Rate */}
+        <View style={styles.gridRow}>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{badgesEarned} / 4</Text>
+            <Text style={styles.statLabel}>BADGES EARNED</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={[styles.statValue, completionRate >= 80 && styles.statValueGood]}>
+              {completionRate}%
+            </Text>
+            <Text style={styles.statLabel}>COMPLETION RATE</Text>
+          </View>
+        </View>
+
         {/* Badges */}
         <Text style={styles.sectionTitle}>BADGES</Text>
-        <View style={styles.badgeRow}>
-          {BADGE_CHECKPOINTS.map(({ label, checkpoint }) => {
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.badgeRow}
+        >
+          {KNOWN_BADGES.map(({ label, checkpoint }) => {
             const earned = dayNumber >= checkpoint;
             const targetDate = addDays(data.settings.startDate, checkpoint - 1);
             return (
@@ -140,7 +146,16 @@ export default function StatsScreen() {
               </View>
             );
           })}
-        </View>
+
+          {/* Mystery badge — logo hidden until revealed in a future update */}
+          <View style={[styles.badgeCard, styles.mysteryCard]}>
+            <View style={styles.mysteryImgBox}>
+              <Text style={styles.mysteryMark}>?</Text>
+            </View>
+            <Text style={[styles.badgeLabel, styles.mysteryText]}>???</Text>
+            <Text style={[styles.badgeStatus, styles.mysteryText]}>???</Text>
+          </View>
+        </ScrollView>
 
         {/* Task breakdown */}
         <Text style={styles.sectionTitle}>TASK BREAKDOWN</Text>
@@ -263,44 +278,6 @@ const styles = StyleSheet.create({
     color: COLORS.red,
     marginTop: 2,
   },
-  badgeRow: {
-    flexDirection: 'row',
-    gap: SPACING.sm,
-    marginBottom: SPACING.lg,
-  },
-  badgeCard: {
-    width: BADGE_CARD_SIZE,
-    alignItems: 'center',
-    backgroundColor: COLORS.surface,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: SPACING.sm,
-  },
-  badgeImg: {
-    width: BADGE_CARD_SIZE - SPACING.sm * 2,
-    height: BADGE_CARD_SIZE - SPACING.sm * 2,
-  },
-  badgeImgDim: {
-    opacity: 0.2,
-  },
-  badgeLabel: {
-    fontSize: FONTS.sizes.xs,
-    fontFamily: FONTS.bodyBold,
-    color: COLORS.textMuted,
-    letterSpacing: 1,
-    marginTop: SPACING.xs,
-  },
-  badgeStatus: {
-    fontSize: FONTS.sizes.xs,
-    fontFamily: FONTS.body,
-    color: COLORS.textMuted,
-    marginTop: 2,
-  },
-  badgeStatusEarned: {
-    color: COLORS.red,
-    fontFamily: FONTS.bodyBold,
-  },
   gridRow: {
     flexDirection: 'row',
     gap: SPACING.sm,
@@ -338,6 +315,64 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     marginTop: SPACING.lg,
     marginBottom: SPACING.md,
+  },
+  badgeRow: {
+    gap: SPACING.sm,
+    paddingBottom: SPACING.md,
+  },
+  badgeCard: {
+    width: BADGE_CARD_SIZE,
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: SPACING.sm,
+  },
+  mysteryCard: {
+    borderColor: COLORS.border,
+    borderStyle: 'dashed',
+  },
+  badgeImg: {
+    width: BADGE_CARD_SIZE - SPACING.sm * 2,
+    height: BADGE_CARD_SIZE - SPACING.sm * 2,
+  },
+  badgeImgDim: {
+    opacity: 0.2,
+  },
+  mysteryImgBox: {
+    width: BADGE_CARD_SIZE - SPACING.sm * 2,
+    height: BADGE_CARD_SIZE - SPACING.sm * 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.background,
+    borderRadius: 6,
+  },
+  mysteryMark: {
+    fontSize: FONTS.sizes.xxxl,
+    fontFamily: FONTS.heading,
+    color: COLORS.border,
+    lineHeight: FONTS.sizes.xxxl + 16,
+  },
+  mysteryText: {
+    color: COLORS.border,
+  },
+  badgeLabel: {
+    fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.textMuted,
+    letterSpacing: 1,
+    marginTop: SPACING.xs,
+  },
+  badgeStatus: {
+    fontSize: FONTS.sizes.xs,
+    fontFamily: FONTS.body,
+    color: COLORS.textMuted,
+    marginTop: 2,
+  },
+  badgeStatusEarned: {
+    color: COLORS.red,
+    fontFamily: FONTS.bodyBold,
   },
   breakdownList: {
     gap: SPACING.md,

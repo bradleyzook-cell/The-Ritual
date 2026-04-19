@@ -27,7 +27,7 @@ import { TASK_IDS, TOTAL_TASKS } from '../constants/tasks';
 
 const RitualContext = createContext<RitualContextType | null>(null);
 
-const BADGE_CHECKPOINTS = [30, 60, 90];
+const BADGE_CHECKPOINTS = [30, 60, 90, 365];
 const ALL_CHECKPOINTS = [30, 60, 90, 365];
 
 export function RitualProvider({ children }: { children: React.ReactNode }) {
