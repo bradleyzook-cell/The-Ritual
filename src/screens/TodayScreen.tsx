@@ -90,9 +90,17 @@ export default function TodayScreen() {
     );
   }, [data, currentStreak, isTodayComplete]);
 
-  // Show failure modal once per session when streak is broken
+  // Detect abandoned: startDate is in the past but zero days ever completed
+  const abandoned = useMemo(() => {
+    if (!data || currentStreak > 0 || isTodayComplete) return false;
+    const today = getTodayString();
+    return data.settings.startDate < today &&
+      !Object.values(data.days).some((d) => d.isComplete);
+  }, [data, currentStreak, isTodayComplete]);
+
+  // Show failure modal once per session when streak is broken or journey is stale
   useEffect(() => {
-    if (streakBroken && !failShownRef.current && !loading) {
+    if ((streakBroken || abandoned) && !failShownRef.current && !loading) {
       failShownRef.current = true;
       setFailPhase('fail');
     }
@@ -156,21 +164,24 @@ export default function TodayScreen() {
           {failPhase === 'fail' && (
             <View style={fail.content}>
               <Text style={fail.skull}>💀</Text>
-              <Text style={fail.heading}>YOU FAILED.</Text>
+              <Text style={fail.heading}>{abandoned ? 'WHERE HAVE\nYOU BEEN?' : 'YOU FAILED.'}</Text>
               <View style={fail.bar} />
               <Text style={fail.sub}>
-                {formatShortDate(yesterday)} was not completed.{'\n'}
-                A WARRior owns it — no excuses.
+                {abandoned
+                  ? 'Your ritual has gone cold.\nA WARRior doesn\'t disappear.'
+                  : `${formatShortDate(yesterday)} was not completed.\nA WARRior owns it — no excuses.`}
               </Text>
-              <Text style={fail.question}>What happened?</Text>
+              <Text style={fail.question}>{abandoned ? 'Ready to begin?' : 'What happened?'}</Text>
 
-              <Pressable
-                style={({ pressed }) => [fail.btnIntegrity, pressed && { opacity: 0.8 }]}
-                onPress={() => setFailPhase('integrity')}
-              >
-                <Text style={fail.btnIntegrityText}>I DID THE WORK</Text>
-                <Text style={fail.btnIntegritySub}>Check off what you completed — on your honor</Text>
-              </Pressable>
+              {!abandoned && (
+                <Pressable
+                  style={({ pressed }) => [fail.btnIntegrity, pressed && { opacity: 0.8 }]}
+                  onPress={() => setFailPhase('integrity')}
+                >
+                  <Text style={fail.btnIntegrityText}>I DID THE WORK</Text>
+                  <Text style={fail.btnIntegritySub}>Check off what you completed — on your honor</Text>
+                </Pressable>
+              )}
 
               <Pressable
                 style={({ pressed }) => [fail.btnRestart, pressed && { opacity: 0.8 }]}
