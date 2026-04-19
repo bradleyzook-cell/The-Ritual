@@ -13,8 +13,7 @@
       "backgroundColor": "#0A0A0A"
     },
     "plugins": [
-      "expo-font",
-      "expo-haptics"
+      "expo-font"
     ],
     "ios": {
       "supportsTablet": false,
