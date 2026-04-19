@@ -29,6 +29,13 @@ const BADGE_CHECKPOINTS = [
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BADGE_CARD_SIZE = Math.floor((SCREEN_WIDTH - SPACING.md * 2 - SPACING.sm * 2) / 3);
 
+function checkpointName(cp: number): string {
+  if (cp === 30) return 'THIRTY';
+  if (cp === 60) return 'SIXTY';
+  if (cp === 90) return 'NINETY';
+  return `DAY ${cp}`;
+}
+
 export default function StatsScreen() {
   const {
     data,
@@ -105,7 +112,7 @@ export default function StatsScreen() {
           {nextBadge ? (
             <>
               <Text style={styles.nextBadgeLabel}>NEXT BADGE</Text>
-              <Text style={styles.nextBadgeCheckpoint}>DAY {nextBadge.checkpoint}</Text>
+              <Text style={styles.nextBadgeCheckpoint}>{checkpointName(nextBadge.checkpoint)}</Text>
               <Text style={styles.nextBadgeDate}>{nextBadge.date}</Text>
             </>
           ) : (

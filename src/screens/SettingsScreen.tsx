@@ -17,7 +17,7 @@ import { COLORS, SPACING, FONTS } from '../constants/theme';
 import { formatDisplayDate } from '../utils/dateUtils';
 
 export default function SettingsScreen() {
-  const { data, loading, saveSettings, resetData, dayNumber } = useRitual();
+  const { data, loading, saveSettings, resetData, restartRitual, dayNumber } = useRitual();
 
   const [name, setName] = useState('');
   const [wakeTime, setWakeTime] = useState('06:00');
@@ -51,14 +51,31 @@ export default function SettingsScreen() {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleReset = () => {
+  const handleStartOver = () => {
     Alert.alert(
       'START OVER',
+      'This will reset your current progress back to Day 1. Your history and stats will be preserved.\n\nAre you sure?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Start Over',
+          style: 'destructive',
+          onPress: async () => {
+            await restartRitual();
+          },
+        },
+      ]
+    );
+  };
+
+  const handleReset = () => {
+    Alert.alert(
+      'DELETE HISTORY',
       'This will permanently delete all your progress, streaks, and history. This cannot be undone.\n\nAre you sure?',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Reset Everything',
+          text: 'Delete Everything',
           style: 'destructive',
           onPress: async () => {
             await resetData();
@@ -160,14 +177,28 @@ export default function SettingsScreen() {
           {/* Danger zone */}
           <View style={styles.dangerZone}>
             <Text style={styles.dangerLabel}>DANGER ZONE</Text>
+
             <Pressable
               style={({ pressed }) => [
                 styles.resetButton,
                 pressed && styles.buttonPressed,
               ]}
-              onPress={handleReset}
+              onPress={handleStartOver}
             >
               <Text style={styles.resetButtonText}>START OVER</Text>
+            </Pressable>
+            <Text style={styles.dangerHint}>Begin The Ritual from Day 1</Text>
+
+            <View style={styles.dangerSpacer} />
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.deleteButton,
+                pressed && styles.buttonPressed,
+              ]}
+              onPress={handleReset}
+            >
+              <Text style={styles.deleteButtonText}>DELETE HISTORY</Text>
             </Pressable>
             <Text style={styles.dangerHint}>
               Permanently deletes all progress, streaks, and history.
@@ -314,6 +345,24 @@ const styles = StyleSheet.create({
     fontSize: FONTS.sizes.md,
     fontFamily: FONTS.bodyBold,
     color: COLORS.redDark,
+    letterSpacing: 2,
+  },
+  dangerSpacer: {
+    height: SPACING.lg,
+  },
+  deleteButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: COLORS.red,
+    borderRadius: 8,
+    paddingVertical: SPACING.md,
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  deleteButtonText: {
+    fontSize: FONTS.sizes.md,
+    fontFamily: FONTS.bodyBold,
+    color: COLORS.red,
     letterSpacing: 2,
   },
   dangerHint: {
