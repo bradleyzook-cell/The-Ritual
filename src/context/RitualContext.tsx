@@ -12,6 +12,7 @@ import {
   toggleTaskInStorage,
   completeDayInStorage,
   completeOnboardingInStorage,
+  restartRitualInStorage,
   updateSettingsInStorage,
   resetAllData,
 } from '../utils/storage';
@@ -52,6 +53,11 @@ export function RitualProvider({ children }: { children: React.ReactNode }) {
 
   const completeOnboarding = useCallback(async (name: string, wakeTime: string) => {
     const updated = await completeOnboardingInStorage(name, wakeTime);
+    setData(updated);
+  }, []);
+
+  const restartRitual = useCallback(async () => {
+    const updated = await restartRitualInStorage();
     setData(updated);
   }, []);
 
@@ -150,6 +156,7 @@ export function RitualProvider({ children }: { children: React.ReactNode }) {
     toggleTaskForDate,
     completeDay,
     completeOnboarding,
+    restartRitual,
     saveSettings,
     resetData,
     currentStreak,

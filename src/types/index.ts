@@ -40,6 +40,7 @@ export interface RitualContextType {
   toggleTaskForDate: (date: string, taskId: TaskId) => Promise<void>;
   completeDay: (date: string) => Promise<void>;
   completeOnboarding: (name: string, wakeTime: string) => Promise<void>;
+  restartRitual: () => Promise<void>;
   saveSettings: (settings: UserSettings) => Promise<void>;
   resetData: () => Promise<void>;
   currentStreak: number;

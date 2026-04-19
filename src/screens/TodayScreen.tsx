@@ -46,6 +46,7 @@ export default function TodayScreen() {
     toggleTask,
     toggleTaskForDate,
     completeDay,
+    restartRitual,
     currentStreak,
     dayNumber,
     todayProgress,
@@ -173,7 +174,10 @@ export default function TodayScreen() {
 
               <Pressable
                 style={({ pressed }) => [fail.btnRestart, pressed && { opacity: 0.8 }]}
-                onPress={() => setFailPhase(null)}
+                onPress={async () => {
+                  await restartRitual();
+                  setFailPhase(null);
+                }}
               >
                 <Text style={fail.btnRestartText}>RESTART THE RITUAL</Text>
                 <Text style={fail.btnRestartSub}>Accept the failure. Begin again as Day 1.</Text>

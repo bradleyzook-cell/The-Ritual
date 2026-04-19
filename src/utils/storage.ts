@@ -110,6 +110,20 @@ export async function completeOnboardingInStorage(
   return updated;
 }
 
+export async function restartRitualInStorage(): Promise<RitualData> {
+  const existing = await loadData();
+  const fresh: RitualData = {
+    settings: {
+      ...existing.settings,
+      startDate: getTodayString(), // anchor calendar to today
+    },
+    days: {},
+    hasOnboarded: true, // preserve — they don't need to re-onboard
+  };
+  await saveData(fresh);
+  return fresh;
+}
+
 export async function resetAllData(): Promise<RitualData> {
   const fresh: RitualData = {
     ...getDefaultData(),
