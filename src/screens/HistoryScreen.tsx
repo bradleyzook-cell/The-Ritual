@@ -156,7 +156,7 @@ export default function HistoryScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>YOUR JOURNEY</Text>
-          <Text style={styles.subtitle}>30 · 60 · 90 Day Challenge</Text>
+          <Text style={styles.subtitle}>Complete the Ritual</Text>
         </View>
 
         {/* Stats strip */}
