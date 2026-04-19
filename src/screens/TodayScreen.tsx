@@ -697,13 +697,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     minWidth: 64,
+    gap: 2,
   },
   streakFire: { fontSize: 18 },
   streakCount: {
     fontSize: FONTS.sizes.xl,
     fontFamily: FONTS.heading,
     color: COLORS.textPrimary,
-    lineHeight: 26,
+    lineHeight: FONTS.sizes.xl + 10,
   },
   progressSection: {
     marginBottom: SPACING.md,
