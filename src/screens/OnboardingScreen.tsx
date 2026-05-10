@@ -39,7 +39,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
     setSaving(false);
   };
 
-  // ── Step 0: Welcome ──────────────────────────────────────────────
+  // ── Step 0: Welcome ─────────────────────────────────────────────────────────────────
   if (step === 0) {
     return (
       <SafeAreaView style={styles.root}>
@@ -75,7 +75,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
     );
   }
 
-  // ── Step 1: The Ritual overview ──────────────────────────────────
+  // ── Step 1: The Ritual overview ──────────────────────────────────────────────
   if (step === 1) {
     return (
       <SafeAreaView style={styles.root}>
@@ -93,7 +93,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
           >
             <Text style={styles.bodyText}>
               Men require discipline to become warriors. The Ritual is an 8-step daily action
-              list built around the Totems of the WARRPath — Fitness, Finance, and Family.
+              list built around the Totems of the WARRPath — Family, Fitness, Finance, and Fortitude.
             </Text>
             <Text style={styles.rulesTitle}>THE LAW</Text>
             <Text style={styles.bodyText}>
@@ -133,7 +133,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
     );
   }
 
-  // ── Step 2: Setup ────────────────────────────────────────────────
+  // ── Step 2: Setup ──────────────────────────────────────────────────────────────────────
   return (
     <SafeAreaView style={styles.root}>
       <KeyboardAvoidingView
@@ -187,7 +187,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
 
           <View style={styles.commitCard}>
             <Text style={styles.commitText}>
-              "The Ritual demands full commitment. Every. Single. Day."
+              “The Ritual demands full commitment. Every. Single. Day.”
             </Text>
           </View>
         </ScrollView>
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
 
-  // ── Welcome ──────────────────────────────────
+  // ── Welcome ────────────────────────────────────────────
   welcomeContent: {
     flex: 1,
     alignItems: 'center',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     height: 48,
   },
 
-  // ── Step shell ────────────────────────────────
+  // ── Step shell ────────────────────────────────────────────
   stepRoot: {
     flex: 1,
   },
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.xxl,
   },
 
-  // ── Step 1 content ────────────────────────────
+  // ── Step 1 content ──────────────────────────────────────────
   rulesTitle: {
     fontSize: FONTS.sizes.xs,
     fontFamily: FONTS.bodyBold,
@@ -374,7 +374,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 
-  // ── Step 2 content ────────────────────────────
+  // ── Step 2 content ──────────────────────────────────────────
   fieldGroup: {
     marginBottom: SPACING.lg,
     marginTop: SPACING.md,
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
 
-  // ── Shared bottom bar ─────────────────────────
+  // ── Shared bottom bar ─────────────────────────────────────────
   bottomBar: {
     paddingHorizontal: SPACING.md,
     paddingBottom: SPACING.lg,
