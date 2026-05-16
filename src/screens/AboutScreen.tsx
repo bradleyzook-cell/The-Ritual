@@ -16,42 +16,42 @@ const STEPS = [
   {
     number: '01',
     title: 'WAKE UP AT A SET TIME',
-    body: `Starting your day, every day, at the same time will build routine and allow you to get work done. Prioritizing a wake-up time secondarily prioritizes a bedtime if you're trying to get a set amount of sleep in place.\n\nRecovery is key for a WARRior to perform at optimal levels.`,
+    body: `Starting your day at the same time every day builds routine and creates a foundation for everything else. Prioritizing a wake-up time secondarily locks in a bedtime — recovery is key for a WARRior performing at optimal levels.`,
   },
   {
     number: '02',
     title: '40+ MINUTE WORKOUT',
-    body: `Sharpening your own blade is the essence of being a WARRior. Dedicating 40 minutes minimum daily to your physical fitness will provide you with resolve to do the hard work necessary to become the man you intend to be.\n\nThe type of workout is inconsequential — run, lift, cross-train, go for a walk, ruck, or even do yoga. Just get up and get moving with intent.`,
+    body: `Sharpening your blade is the essence of being a WARRior. Dedicate 40 minutes minimum daily to physical fitness — run, lift, ruck, walk, or yoga. Just move with purpose.`,
   },
   {
     number: '03',
     title: 'DRINK 1 GALLON OF WATER',
-    body: `Drinking a gallon of water a day sounds simple, but this requirement will teach discipline and commitment over time. You won't be able to just chug a gallon of water at the end of the night. You must plan over the course of the day to consume water.\n\nDiscipline aside, consuming a gallon of water daily will provide many nutritional benefits.`,
+    body: `Drinking a gallon a day demands planning — you can't chug it at night. This requirement teaches discipline and daily commitment while delivering real nutritional benefits.`,
   },
   {
     number: '04',
     title: 'DAILY PERSONAL FINANCE TOUCH POINT',
-    body: `Touching your finances daily will keep you in tune with your fiscal situation as well as help guide you in decision making situations that may otherwise get you into money trouble.\n\nIf you are married, or share your finances with someone, you should be including them in these discussions as well.`,
+    body: `Touching your finances daily keeps you in tune with your fiscal situation and guides your decisions. If you share finances, include your partner in these conversations.`,
   },
   {
     number: '05',
     title: 'INTENTIONAL FAMILY TIME',
-    body: `FAMILY is the foundation of the WARRPath Totems. Family is, far and away, the most important thing we have in our lives. It is why we build up our FITNESS — so we can be present and active with them. It is why we work on our FINANCES — so we can furnish them with all that is required for life.\n\nMaking sure we touch base with our wife and kids, individually, on a daily basis ensures we grow and nourish those bonds and keep the family structure tight.\n\nThose men who are unmarried and/or don't have children should find family members to keep in touch with daily. Remember — family doesn't necessarily require blood relation.`,
+    body: `Family is the foundation of the WARRPath Totems — it's why we build fitness and pursue financial strength. Connect with your wife and kids individually, every single day. Those without immediate family should extend this commitment to close relationships.`,
   },
   {
     number: '06',
     title: 'NO DRUGS OR ALCOHOL',
-    body: `An altered mind is an unsharpened mind. Removing drugs and alcohol from your daily routine will sharpen your mind and have profound effects on your physical fitness.\n\nThe simple act of removing these items from your routine will be more beneficial than you can imagine to your sleep, your mental clarity, and your physical performance.`,
+    body: `An altered mind is an unsharpened mind. Removing drugs and alcohol will improve your sleep, sharpen your mental clarity, and elevate your physical performance.`,
   },
   {
     number: '07',
     title: 'INGREDIENT-BASED DIET',
-    body: `An Ingredient-Based Diet is a style of eating focused on whole, minimally processed foods — ingredients you can recognize, pronounce, and trace back to natural sources. Instead of buying packaged or pre-made meals, you build your diet around individual ingredients that you prepare yourself.\n\nThe intent here is to clean up the fuel you are placing in your body so that you can perform to your potential.`,
+    body: `An Ingredient-Based Diet means building your meals around whole, minimally processed foods you can recognize and trace to natural sources. Clean fuel is how a WARRior performs at his potential.`,
   },
   {
     number: '08',
     title: 'DAILY PLANNER OR JOURNAL WORK',
-    body: `A successful WARRior is not a man who is simply just physically fit, but also one who is mentally and intellectually capable. Keeping a Daily Planner or Journal will enable you to capture all your ideas, thoughts, dreams, fears, and actions into one place.\n\nCentralizing this information will provide a powerful resource for you to not only plan the future, but revisit the past and learn.`,
+    body: `A WARRior is not just physically fit — he is mentally and intellectually sharp. A daily planner or journal captures your ideas, plans, fears, and victories, providing a powerful resource to plan the future and revisit the past.`,
   },
 ];
 
@@ -110,6 +110,7 @@ export default function AboutScreen() {
                 source={require('../../assets/logo-warrbuilt.png')}
                 style={styles.warrbuiltLogo}
                 resizeMode="contain"
+                tintColor="#FFFFFF"
               />
             </Pressable>
             <Pressable
@@ -157,10 +158,10 @@ const styles = StyleSheet.create({
     marginVertical: SPACING.lg,
   },
   heroBody: {
-    fontSize: FONTS.sizes.md,
+    fontSize: FONTS.sizes.lg,
     fontFamily: FONTS.body,
     color: COLORS.textSecondary,
-    lineHeight: 24,
+    lineHeight: 26,
   },
 
   // Overview card
@@ -227,10 +228,10 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   stepBody: {
-    fontSize: FONTS.sizes.md,
+    fontSize: FONTS.sizes.lg,
     fontFamily: FONTS.body,
     color: COLORS.textSecondary,
-    lineHeight: 24,
+    lineHeight: 26,
     paddingLeft: 52 + SPACING.md,
   },
   stepDivider: {
@@ -254,7 +255,6 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   logoWrap: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.sm,

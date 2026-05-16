@@ -56,8 +56,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.border,
-    padding: SPACING.md,
-    marginBottom: SPACING.sm,
+    paddingVertical: 10,
+    paddingHorizontal: SPACING.md,
+    marginBottom: 6,
   },
   containerComplete: {
     borderColor: COLORS.redDark,

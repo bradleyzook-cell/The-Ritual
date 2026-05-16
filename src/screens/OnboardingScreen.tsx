@@ -61,6 +61,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
               source={require('../../assets/logo-warrbuilt.png')}
               style={styles.warrbuiltLogo}
               resizeMode="contain"
+              tintColor="#FFFFFF"
             />
           </View>
 
@@ -75,7 +76,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
     );
   }
 
-  // ── Step 1: The Ritual overview ──────────────────────────────────────────────
+  // ── Step 1: The Ritual overview ──────────────────────────────────────────
   if (step === 1) {
     return (
       <SafeAreaView style={styles.root}>
@@ -187,7 +188,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
 
           <View style={styles.commitCard}>
             <Text style={styles.commitText}>
-              “The Ritual demands full commitment. Every. Single. Day.”
+              "The Ritual demands full commitment. Every. Single. Day."
             </Text>
           </View>
         </ScrollView>
@@ -263,7 +264,6 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xl,
   },
   warrbuiltCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.sm,
