@@ -57,12 +57,10 @@ export default function OnboardingScreen({ onComplete }: Props) {
           </Text>
 
           <View style={styles.warrbuiltCard}>
-            <Image
-              source={require('../../assets/logo-warrbuilt.png')}
-              style={styles.warrbuiltLogo}
-              resizeMode="contain"
-              tintColor="#FFFFFF"
-            />
+            <Text style={styles.warrbuiltText}>
+              <Text style={styles.warrText}>WARR</Text>
+              <Text style={styles.builtText}>Built</Text>
+            </Text>
           </View>
 
           <Pressable
@@ -269,9 +267,15 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
     marginBottom: SPACING.xl,
   },
-  warrbuiltLogo: {
-    width: 180,
-    height: 48,
+  warrbuiltText: {
+    fontSize: 32,
+    fontFamily: FONTS.heading,
+  },
+  warrText: {
+    color: COLORS.red,
+  },
+  builtText: {
+    color: COLORS.textPrimary,
   },
 
   // ── Step shell ────────────────────────────────────────────

@@ -106,12 +106,10 @@ export default function AboutScreen() {
               onPress={() => Linking.openURL('https://www.warrbuilt.com')}
               style={({ pressed }) => [styles.logoWrap, pressed && { opacity: 0.7 }]}
             >
-              <Image
-                source={require('../../assets/logo-warrbuilt.png')}
-                style={styles.warrbuiltLogo}
-                resizeMode="contain"
-                tintColor="#FFFFFF"
-              />
+              <Text style={styles.warrbuiltText}>
+                <Text style={styles.warrText}>WARR</Text>
+                <Text style={styles.builtText}>Built</Text>
+              </Text>
             </Pressable>
             <Pressable
               onPress={() => Linking.openURL('https://www.instagram.com/warrbuilt')}
@@ -259,9 +257,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.sm,
   },
-  warrbuiltLogo: {
-    width: 200,
-    height: 52,
+  warrbuiltText: {
+    fontSize: 34,
+    fontFamily: FONTS.heading,
+  },
+  warrText: {
+    color: COLORS.red,
+  },
+  builtText: {
+    color: COLORS.textPrimary,
   },
   igBtn: {
     flexDirection: 'row',
