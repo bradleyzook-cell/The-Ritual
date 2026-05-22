@@ -16,12 +16,12 @@ const STEPS = [
   {
     number: '01',
     title: 'WAKE UP AT A SET TIME',
-    body: `Starting your day at the same time every day builds routine and creates a foundation for everything else. Prioritizing a wake-up time secondarily locks in a bedtime — recovery is key for a WARRior performing at optimal levels.`,
+    body: `Starting your day at the same time every day builds routine and creates a foundation for everything else. Prioritizing a wake-up time secondarily locks in a bedtime — recovery is key for a man performing at optimal levels.`,
   },
   {
     number: '02',
     title: '40+ MINUTE WORKOUT',
-    body: `Sharpening your blade is the essence of being a WARRior. Dedicate 40 minutes minimum daily to physical fitness — run, lift, ruck, walk, or yoga. Just move with purpose.`,
+    body: `Sharpening your blade is the essence of being a man. Dedicate 40 minutes minimum daily to physical fitness — run, lift, ruck, walk, or yoga. Just move with purpose.`,
   },
   {
     number: '03',
@@ -46,12 +46,12 @@ const STEPS = [
   {
     number: '07',
     title: 'INGREDIENT-BASED DIET',
-    body: `An Ingredient-Based Diet means building your meals around whole, minimally processed foods you can recognize and trace to natural sources. Clean fuel is how a WARRior performs at his potential.`,
+    body: `An Ingredient-Based Diet means building your meals around whole, minimally processed foods you can recognize and trace to natural sources. Clean fuel is how a man performs at his potential.`,
   },
   {
     number: '08',
     title: 'DAILY PLANNER OR JOURNAL WORK',
-    body: `A WARRior is not just physically fit — he is mentally and intellectually sharp. A daily planner or journal captures your ideas, plans, fears, and victories, providing a powerful resource to plan the future and revisit the past.`,
+    body: `A man is not just physically fit — he is mentally and intellectually sharp. A daily planner or journal captures your ideas, plans, fears, and victories, providing a powerful resource to plan the future and revisit the past.`,
   },
 ];
 

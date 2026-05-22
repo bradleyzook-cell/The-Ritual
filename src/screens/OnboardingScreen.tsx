@@ -53,7 +53,7 @@ export default function OnboardingScreen({ onComplete }: Props) {
           <Text style={styles.welcomeEyebrow}>WELCOME TO</Text>
           <Text style={styles.welcomeTitle}>THE RITUAL</Text>
           <Text style={styles.welcomeSub}>
-            A daily discipline framework{'\n'}built for WARRiors.
+            A daily discipline framework{'\n'}built for men.
           </Text>
 
           <View style={styles.warrbuiltCard}>

@@ -168,8 +168,8 @@ export default function TodayScreen() {
               <View style={fail.bar} />
               <Text style={fail.sub}>
                 {abandoned
-                  ? 'Your ritual has gone cold.\nA WARRior doesn\'t disappear.'
-                  : `${formatShortDate(yesterday)} was not completed.\nA WARRior owns it — no excuses.`}
+                  ? 'Your ritual has gone cold.\nA man doesn\'t disappear.'
+                  : `${formatShortDate(yesterday)} was not completed.\nA man owns it — no excuses.`}
               </Text>
               <Text style={fail.question}>{abandoned ? 'Ready to begin?' : 'What happened?'}</Text>
 
